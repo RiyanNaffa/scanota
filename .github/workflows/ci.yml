@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: ["main", "dev"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dev dependencies
+        run: pip install -r app/requirements-dev.txt
+
+      - name: Lint (ruff check)
+        run: ruff check app tests
+
+      - name: Format check (ruff format)
+        run: ruff format --check app tests
+
+      - name: Unit tests
+        run: pytest tests/unit -v

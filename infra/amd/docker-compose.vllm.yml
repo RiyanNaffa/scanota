@@ -1,0 +1,41 @@
+# infra/amd/docker-compose.vllm.yml
+# AMD ROCm vLLM service – overlay on top of the main docker-compose.yml
+# Usage:
+#   docker compose -f docker-compose.yml -f infra/amd/docker-compose.vllm.yml up -d
+#
+# Required env vars (add to .env):
+#   VLLM_IMAGE    – ROCm vLLM Docker image tag (see infra/amd/README.md for how to choose)
+#   VLLM_MODEL    – HuggingFace model ID to serve, e.g. Qwen/Qwen2.5-7B-Instruct
+#   VLLM_PORT     – Port to expose vLLM on (default 8080)
+#   MAX_MODEL_LEN – Context length override (e.g. 8192)
+
+services:
+  vllm:
+    image: ${VLLM_IMAGE:-rocm/vllm:latest}
+    restart: unless-stopped
+    devices:
+      - /dev/kfd
+      - /dev/dri
+    group_add:
+      - video
+    ipc: host
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp=unconfined
+    shm_size: "16gb"
+    volumes:
+      - hf_cache:/root/.cache/huggingface
+    ports:
+      - "${VLLM_PORT:-8080}:8000"
+    environment:
+      HUGGING_FACE_HUB_TOKEN: ${HUGGING_FACE_HUB_TOKEN:-}
+    command: >
+      --model ${VLLM_MODEL}
+      --served-model-name ${VLLM_MODEL}
+      --max-model-len ${MAX_MODEL_LEN:-8192}
+      --port 8000
+      --host 0.0.0.0
+
+volumes:
+  hf_cache:
