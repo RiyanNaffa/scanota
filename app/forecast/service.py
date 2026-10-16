@@ -21,6 +21,14 @@ from app.forecast.policy import (
 
 logger = logging.getLogger(__name__)
 
+# fallback_reason from forecast_sku -> data_quality shown to the client. Anything not listed
+# (statsforecast missing, model error) means the forecast model did not run at all.
+_DATA_QUALITY = {None: "ok", "short_history": "insufficient_history", "no_data": "insufficient_history"}
+
+
+def data_quality_label(fc_result: dict[str, Any]) -> str:
+    return _DATA_QUALITY.get(fc_result.get("fallback_reason"), "model_unavailable")
+
 
 def get_confirmed_item_sales(db: Session) -> list[dict[str, Any]]:
     """Return sku_id, tx_date, qty from confirmed transactions."""
@@ -62,6 +70,7 @@ def build_restock_list(db: Session) -> list[dict[str, Any]]:
                 "model_used": "WindowAverage(no_data)",
                 "sigma": 0.0,
                 "is_fallback": True,
+                "fallback_reason": "no_data",
                 "wape_primary": None,
                 "wape_baseline": None,
             }
@@ -77,7 +86,7 @@ def build_restock_list(db: Session) -> list[dict[str, Any]]:
         act = action(current_stock, rop)
         reason = restock_reason(name, current_stock, unit, weekly_fc, days_out, ltd)
 
-        data_quality = "insufficient_history" if fc_result["is_fallback"] else "ok"
+        data_quality = data_quality_label(fc_result)
 
         results.append({
             "sku_id": sku_id,

@@ -233,3 +233,20 @@
 **UNVERIFIED**: whether `/ocr` accepts a base64 data URL as `document_url` (docs only show an https URL), token budgets against the live Qwen3.8-27B endpoint, real 429 behaviour. `MiniCPM-V-4.7-35B-A3B` is kept as the vision model on request, but it is not in the Token Factory doc's model table: check `GET /v1/models`
 
 ---
+
+## statsforecast was not running – 2026-10-17
+
+**What was found**
+- `import statsforecast` failed in the api image: unpinned `pyarrow` (pulled in via fugue) now needs NumPy 2, while `numpy==1.26.4` is pinned. `_try_import_statsforecast` swallowed the ImportError, so all 38 SKUs silently used the 4-week moving average, labelled `insufficient_history`, and `/restock` never ran TSB or Croston. The same mismatch also crashes pytest at startup in that environment (fugue ships a pytest plugin)
+
+**What was done**
+- `app/requirements.txt`: `pyarrow==17.0.0`. After the rebuild `/restock` uses TSB for 23 SKUs and CrostonOptimized for 15, in about 3 s
+- `app/forecast/models.py`: the import failure is logged once as a warning; fallbacks carry a `fallback_reason` and a distinct `model_used`; `NIXTLA_ID_AS_COL=1` silences a FutureWarning that fired on every fit
+- `app/forecast/service.py`: `data_quality` is `model_unavailable` when the model did not run, `insufficient_history` only for short history
+- `tests/unit/test_forecast_models.py`: 8 tests; the real-model test is skipped only when statsforecast is absent and fails when it is installed but broken
+- Sigma for safety stock was `std(abs(error))`, the spread of the error sizes, not the size of the errors: on the seeded data it was a median 0.44x of the RMSE (25 of 38 SKUs under half). Now `rmse()` of the signed one-step errors (`app/forecast/metrics.py`, `app/forecast/models.py`). Reorder points rose for all 38 SKUs (median x1.49, max x2.75); no action changed because the seeded stock is far above every reorder point. Tests: `TestRMSE` in `test_forecast.py`, `test_sigma_is_the_rmse_of_one_step_errors` in `test_forecast_models.py` (runs where statsforecast is installed)
+
+**UNVERIFIED / open**
+- All 38 SKUs come out `ok` because the seeded stock is well above every reorder point; lower a stock level to see `order_now`
+
+---

@@ -29,6 +29,9 @@ rapidfuzz==3.11.0
 
 # Forecast
 statsforecast==1.7.8
+# statsforecast imports pyarrow (via fugue). Unpinned, pip installs a release that needs
+# NumPy 2, which breaks the import with numpy==1.26.4 below and silently disables forecasting.
+pyarrow==17.0.0
 numpy==1.26.4
 pandas==2.2.2
 

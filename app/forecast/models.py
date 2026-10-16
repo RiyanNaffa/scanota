@@ -6,18 +6,27 @@ Falls back to WindowAverage for SKUs with < 8 weeks of history.
 """
 from __future__ import annotations
 
+import functools
 import logging
+import os
 from typing import Any
 
 import numpy as np
 import pandas as pd
 
+from app.forecast.metrics import rmse
+
 logger = logging.getLogger(__name__)
+
+# statsforecast 1.7 warns on every forecast() call that the id will become a column. Opt in now;
+# the code below picks the prediction column by name, so it works with either layout.
+os.environ.setdefault("NIXTLA_ID_AS_COL", "1")
 
 MIN_HISTORY_WEEKS = 8
 WINDOW_SIZE = 4
 
 
+@functools.lru_cache(maxsize=1)
 def _try_import_statsforecast():
     try:
         from statsforecast import StatsForecast
@@ -27,7 +36,11 @@ def _try_import_statsforecast():
             WindowAverage,
         )
         return StatsForecast, TSB, CrostonOptimized, WindowAverage
-    except ImportError:
+    except ImportError as exc:
+        # Never stay silent: without statsforecast every SKU quietly gets the moving average.
+        logger.warning(
+            "statsforecast is unavailable (%s); using the moving-average fallback for all SKUs", exc
+        )
         return None, None, None, None
 
 
@@ -74,22 +87,28 @@ def forecast_sku(
     """Forecast demand for a single SKU series.
 
     Returns:
-        dict with keys: forecast (list), model_used, sigma, is_fallback, wape_primary, wape_baseline
+        dict with keys: forecast (list), model_used, sigma, is_fallback, fallback_reason
+        (None, "short_history", "statsforecast_unavailable" or "error"), wape_primary, wape_baseline
     """
     StatsForecast, TSB, CrostonOptimized, WindowAverage = _try_import_statsforecast()
 
     values = series.values.astype(float)
     n = len(values)
 
-    # Fall back for short history
-    if n < MIN_HISTORY_WEEKS or StatsForecast is None:
+    # Fall back when statsforecast cannot be imported, or the history is too short
+    if StatsForecast is None or n < MIN_HISTORY_WEEKS:
+        unavailable = StatsForecast is None
         avg = float(np.mean(values[-WINDOW_SIZE:])) if n >= 1 else 0.0
         sigma = float(np.std(values[-WINDOW_SIZE:])) if n >= 2 else 0.0
         return {
             "forecast": [avg] * horizon,
-            "model_used": "WindowAverage(fallback)",
+            "model_used": (
+                "WindowAverage(statsforecast_unavailable)" if unavailable
+                else "WindowAverage(fallback)"
+            ),
             "sigma": sigma,
             "is_fallback": True,
+            "fallback_reason": "statsforecast_unavailable" if unavailable else "short_history",
             "wape_primary": None,
             "wape_baseline": None,
         }
@@ -162,8 +181,11 @@ def forecast_sku(
         col = [c for c in fc_final.columns if c not in ("unique_id", "ds")][0]
         forecast_vals = [max(0.0, float(v)) for v in fc_final[col].values]
 
-        # Sigma = std of one-step forecast errors (in-sample last 8 weeks)
-        sigma_errors = []
+        # Sigma = RMSE of one-step-ahead forecasts over the last 8 weeks (the model is refit at
+        # each step). Safety stock needs the typical size of an error, bias included; the
+        # standard deviation of the absolute errors understated it by about half on the seed data.
+        actuals: list[float] = []
+        preds: list[float] = []
         for j in range(max(1, n - 8), n):
             try:
                 df_s = pd.DataFrame({
@@ -174,17 +196,18 @@ def forecast_sku(
                 sf_s = StatsForecast(models=[chosen], freq="W", n_jobs=1)
                 fc_s = sf_s.forecast(df=df_s, h=1)
                 col_s = [c for c in fc_s.columns if c not in ("unique_id", "ds")][0]
-                pred_j = float(fc_s[col_s].values[0])
-                sigma_errors.append(abs(pred_j - values[j]))
+                preds.append(float(fc_s[col_s].values[0]))
+                actuals.append(float(values[j]))
             except Exception:
                 pass
-        sigma = float(np.std(sigma_errors)) if len(sigma_errors) >= 2 else float(np.std(values))
+        sigma = rmse(actuals, preds) if len(actuals) >= 2 else float(np.std(values))
 
         return {
             "forecast": forecast_vals,
             "model_used": best_model_name,
             "sigma": sigma,
             "is_fallback": False,
+            "fallback_reason": None,
             "wape_primary": best_wape,
             "wape_baseline": baseline_wape,
         }
@@ -198,6 +221,7 @@ def forecast_sku(
             "model_used": "WindowAverage(error_fallback)",
             "sigma": sigma,
             "is_fallback": True,
+            "fallback_reason": "error",
             "wape_primary": None,
             "wape_baseline": None,
         }
