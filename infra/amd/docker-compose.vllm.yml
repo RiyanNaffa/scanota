@@ -1,5 +1,7 @@
 # infra/amd/docker-compose.vllm.yml
 # AMD ROCm vLLM service – overlay on top of the main docker-compose.yml
+# SELF-HOSTING ONLY: not needed (and not meant) for the AMD Tokenfactory API, which is
+# just LLM_BASE_URL + LLM_API_KEY in .env. See infra/amd/README.md.
 # Usage:
 #   docker compose -f docker-compose.yml -f infra/amd/docker-compose.vllm.yml up -d
 #

@@ -206,3 +206,30 @@
 **UNVERIFIED**: OCR evaluation (needs live LLM), backtest (needs statsforecast in Docker), browser visual review
 
 ---
+
+## LLM efficiency, retry and OCR hint – 2026-10-17
+
+**What was done**
+- `app/config.py`: settings for reasoning effort and max tokens (SQL: medium/2048, answer: low/1024, restock rephrase: low/512), retry policy, OCR
+- `app/llm.py`: shared client factory, `completion_kwargs`, `call_with_retry` (429, 5xx and connection errors; `Retry-After` honoured, cap 65 s because Tokenfactory sends 60 s; timeouts not retried), `message_text` warns when `max_tokens` cuts a reply. SDK retries are off so the waits do not stack
+- `app/chat/service.py`, `app/api/restock.py`: Qwen calls use the token budget and the retry wrapper; restock rephrasing gives up at the first long 429
+- `app/extraction/ocr.py`: MinerU2.5-Pro OCR client (`POST {LLM_BASE_URL}/ocr`, `document_url` request, `pages[].markdown` response per the Token Factory docs); its text is a hint in the vision prompt, any OCR failure falls back to the vision model alone
+- `app/extraction/client.py`: retry wrapper, OCR hint, and a transport error no longer triggers the parse-feedback retry
+- `app/ingest/offline.py`: extraction runs in a worker thread so retry sleeps do not block the event loop
+- `dashboard/api_client.py`: 150 s timeout for LLM-backed calls so a 60 s Retry-After wait fits
+- `infra/amd/README.md`: vLLM compose is self-hosting only; Tokenfactory needs no compose
+- `.env.example`: Tokenfactory URL as a comment, new settings
+- `app/db/url.py`: bare `postgresql://` URLs are rewritten to `postgresql+psycopg://`. SQLAlchemy defaulted to psycopg2, which is not installed (only psycopg 3), so the api container crash-looped on start; `.env` keeps the plain libpq form
+- `dashboard/Dockerfile`: code now lives at `/app/dashboard` with `PYTHONPATH=/app`. It was copied to `/app`, so every `import dashboard.*` raised ModuleNotFoundError and no page loaded
+- `app/db/repository.py`: `get_summary` rendered `WHERE AND t.status = ...` in the top-products query, so `GET /summary` always returned 500; the stray `.replace()` is gone
+- `docker-compose.yml`: `./data` mounted read-only into the api container. `data/` was not in the image, so `python -m app.db.seed` would have logged "products.csv not found" and seeded nothing
+- `app/validation/confidence.py`: any `ITEM_UNMATCHED` now forces `needs_review`. One unmatched item scores exactly 0.85, equal to the threshold, so it used to be auto-confirmed without an SKU
+- `app/extraction/client.py`, `app/config.py`: optional `LLM_MODEL_VISION_FALLBACK`, used per receipt when the vision model fails with 5xx or a timeout after retries (MiniCPM-V-4.7-35B-A3B had no healthy workers on Tokenfactory; DeepSeek-V4.1-Flash read two sample receipts exactly)
+- Timeouts: the fallback model timed out at 60 s on a real receipt. Measured on Tokenfactory: the first request to an idle model takes 35-65 s (DeepSeek-V4.1-Flash: 35.7 s then 1.5 s for a 5-token ping; 65 s for a 84-token receipt), later ones 1-3 s. `LLM_TIMEOUT_SECONDS` default 60 -> 120, and `ExtractionClient` now reads it instead of a hardcoded 60. Dashboard LLM timeout 150 -> 300 s (worst case OCR + main + fallback)
+- `app/api/ingest.py`: `ExtractionError` -> HTTP 502 with a plain Indonesian message (provider details only in the log); `dashboard/api_client.py` shows the API's `detail` instead of the raw httpx text
+- `app/db/init/02-roles.sh` + `.gitattributes`: the script had CRLF endings from the Windows checkout, so the container failed with `env: 'bash\r': No such file or directory` and `scanota_ro` was never created (Postgres skips init scripts once the data volume exists). Script converted to LF, `*.sh text eol=lf` added; role created on the existing volume by running the script (idempotent, no data loss). Verified: login as `scanota_ro`, SELECT on the two views only, raw tables and writes blocked, `POST /chat` answers in 24 s with `reasoning_effort` medium/low accepted by Qwen3.8-27B and no max_tokens warning
+- Tests: `test_llm.py`, `test_ocr.py`, `test_extraction_client.py`, `test_chat_budget.py`, `test_db_url.py`, `test_summary.py`, `test_dashboard_client.py`, `test_ingest_receipt_errors.py`
+
+**UNVERIFIED**: whether `/ocr` accepts a base64 data URL as `document_url` (docs only show an https URL), token budgets against the live Qwen3.8-27B endpoint, real 429 behaviour. `MiniCPM-V-4.7-35B-A3B` is kept as the vision model on request, but it is not in the Token Factory doc's model table: check `GET /v1/models`
+
+---

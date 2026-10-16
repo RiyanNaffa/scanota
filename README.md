@@ -64,8 +64,8 @@ Never commit `.env`. All keys are read from environment variables.
 
 ## Runs on AMD
 
-- Models are served with **vLLM on ROCm** (AMD Developer Cloud / Instinct). See `infra/amd/`.
-- The app talks to any OpenAI-compatible endpoint, so `LLM_BASE_URL` can point to the AMD Tokenfactory during development and to your own vLLM endpoint for the final demo.
+- For the final demo, models are served with **vLLM on ROCm** (AMD Developer Cloud / Instinct). That setup is only for self-hosting; see `infra/amd/README.md`.
+- The app talks to any OpenAI-compatible endpoint, so `LLM_BASE_URL` can point to the AMD Tokenfactory during development (no vLLM needed) and to your own vLLM endpoint for the final demo. Tokenfactory also offers an OCR endpoint (MinerU2.5-Pro) that scanota uses as a hint for receipt reading; a self-hosted vLLM has no such route, so set `OCR_ENABLED=false` there.
 - Proof (`rocm-smi`, vLLM logs, latency and throughput): `docs/amd-proof.md`.
 
 ## Evolus building blocks
