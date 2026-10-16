@@ -408,7 +408,7 @@ def get_summary(
             f"FROM transaction_items i "
             f"JOIN transactions t ON t.id = i.transaction_id "
             f"LEFT JOIN products p ON p.sku_id = i.sku_id "
-            f"{where.replace('t.status', 'AND t.status')} "
+            f"{where} "
             f"GROUP BY p.name ORDER BY revenue DESC LIMIT 10"
         ),
         params,
