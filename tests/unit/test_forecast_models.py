@@ -12,7 +12,7 @@ import pytest
 from app.forecast import models
 from app.forecast.metrics import rmse
 from app.forecast.models import forecast_sku
-from app.forecast.service import data_quality_label
+from app.forecast.service import data_quality_label, shelf_life_note
 
 
 def _series(values) -> pd.Series:
@@ -105,7 +105,7 @@ def test_sigma_is_the_rmse_of_one_step_errors():
     make = (lambda: TSB(alpha_d=0.2, alpha_p=0.2)) if result["model_used"] == "TSB" else CrostonOptimized
     values = series.values.astype(float)
     actuals, preds = [], []
-    for j in range(len(values) - 8, len(values)):
+    for j in range(max(1, len(values) - models.SIGMA_LOOKBACK_WEEKS), len(values)):
         df = pd.DataFrame(
             {"unique_id": "sku", "ds": [p.to_timestamp() for p in series.index[:j]], "y": values[:j]}
         )
@@ -115,3 +115,13 @@ def test_sigma_is_the_rmse_of_one_step_errors():
 
     assert result["sigma"] == pytest.approx(rmse(actuals, preds))
     assert result["sigma"] > float(np.std(np.abs(np.subtract(preds, actuals))))
+
+
+def test_shelf_life_note_messages():
+    assert shelf_life_note(None, 10, 90) is None
+    assert shelf_life_note("high", 120.0, 90) == (
+        "Stok cukup sekitar 120 hari, melebihi masa simpan 90 hari: berisiko kedaluwarsa. "
+        "Tahan pembelian dan jual stok lama dulu."
+    )
+    assert "tidak terjual" in shelf_life_note("high", float("inf"), 90)
+    assert shelf_life_note("watch", 70.0, 90) == "Stok cukup sekitar 70 hari, mendekati masa simpan 90 hari. Pantau."

@@ -24,6 +24,10 @@ os.environ.setdefault("NIXTLA_ID_AS_COL", "1")
 
 MIN_HISTORY_WEEKS = 8
 WINDOW_SIZE = 4
+# Weeks of one-step errors behind sigma. The backtest (python -m app.eval.backtest) showed 8 weeks
+# gives an estimate that swings about 3x more between weeks than 26 weeks (CV 0.17 vs 0.06), with
+# no gain in stockouts or safety stock from the shorter window.
+SIGMA_LOOKBACK_WEEKS = 26
 
 
 @functools.lru_cache(maxsize=1)
@@ -42,6 +46,44 @@ def _try_import_statsforecast():
             "statsforecast is unavailable (%s); using the moving-average fallback for all SKUs", exc
         )
         return None, None, None, None
+
+
+def make_model(name: str):
+    """Model instance for a name forecast_sku reports: TSB, CrostonOptimized or WindowAverage."""
+    _, TSB, CrostonOptimized, WindowAverage = _try_import_statsforecast()
+    if name == "TSB":
+        return TSB(alpha_d=0.2, alpha_p=0.2)
+    if name == "CrostonOptimized":
+        return CrostonOptimized()
+    return WindowAverage(window_size=WINDOW_SIZE)
+
+
+def predict(name: str, values: np.ndarray, index: pd.PeriodIndex, h: int) -> np.ndarray:
+    """Fit the named model on `values` (weekly, aligned with `index`) and forecast h weeks."""
+    StatsForecast, *_ = _try_import_statsforecast()
+    df = pd.DataFrame({
+        "unique_id": ["sku"] * len(values),
+        "ds": [p.to_timestamp() for p in index[: len(values)]],
+        "y": values,
+    })
+    fc = StatsForecast(models=[make_model(name)], freq="W", n_jobs=1).forecast(df=df, h=h)
+    col = [c for c in fc.columns if c not in ("unique_id", "ds")][0]
+    return fc[col].values.astype(float)
+
+
+def one_step_forecasts(
+    name: str, values: np.ndarray, index: pd.PeriodIndex, start: int, end: int
+) -> tuple[list[float], list[float]]:
+    """(actuals, predictions) for weeks start..end-1, each predicted from the weeks before it."""
+    actuals: list[float] = []
+    preds: list[float] = []
+    for j in range(start, end):
+        try:
+            preds.append(float(predict(name, values[:j], index, 1)[0]))
+            actuals.append(float(values[j]))
+        except Exception as exc:
+            logger.debug("one-step forecast failed at week %d: %s", j, exc)
+    return actuals, preds
 
 
 def build_weekly_series(
@@ -184,22 +226,9 @@ def forecast_sku(
         # Sigma = RMSE of one-step-ahead forecasts over the last 8 weeks (the model is refit at
         # each step). Safety stock needs the typical size of an error, bias included; the
         # standard deviation of the absolute errors understated it by about half on the seed data.
-        actuals: list[float] = []
-        preds: list[float] = []
-        for j in range(max(1, n - 8), n):
-            try:
-                df_s = pd.DataFrame({
-                    "unique_id": ["sku"] * j,
-                    "ds": [p.to_timestamp() for p in series.index[:j]],
-                    "y": values[:j],
-                })
-                sf_s = StatsForecast(models=[chosen], freq="W", n_jobs=1)
-                fc_s = sf_s.forecast(df=df_s, h=1)
-                col_s = [c for c in fc_s.columns if c not in ("unique_id", "ds")][0]
-                preds.append(float(fc_s[col_s].values[0]))
-                actuals.append(float(values[j]))
-            except Exception:
-                pass
+        actuals, preds = one_step_forecasts(
+            best_model_name, values, series.index, max(1, n - SIGMA_LOOKBACK_WEEKS), n
+        )
         sigma = rmse(actuals, preds) if len(actuals) >= 2 else float(np.std(values))
 
         return {
