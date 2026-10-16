@@ -25,3 +25,17 @@ def bias(actual: list[float] | np.ndarray, forecast: list[float] | np.ndarray) -
     if len(a) == 0:
         return 0.0
     return float(np.mean(f - a))
+
+
+def rmse(actual: list[float] | np.ndarray, forecast: list[float] | np.ndarray) -> float:
+    """Root mean squared error: the typical size of a forecast error, bias included.
+
+    This is the sigma that safety stock needs. np.std(abs(error)) is not: it measures how much
+    the error sizes vary, so errors of +3, -3, +3, -3 give 0 instead of 3.
+    Returns 0.0 for empty input.
+    """
+    a = np.asarray(actual, dtype=float)
+    f = np.asarray(forecast, dtype=float)
+    if a.size == 0:
+        return 0.0
+    return float(np.sqrt(np.mean((f - a) ** 2)))

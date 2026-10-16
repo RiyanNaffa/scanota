@@ -3,9 +3,10 @@ from __future__ import annotations
 
 import math
 
+import numpy as np
 import pytest
 
-from app.forecast.metrics import bias, wape
+from app.forecast.metrics import bias, rmse, wape
 from app.forecast.policy import (
     action,
     days_until_stockout,
@@ -116,3 +117,31 @@ class TestAction:
 
     def test_exactly_at_rop(self):
         assert action(current_stock=10, rop=10) == "order_now"
+
+
+class TestRMSE:
+    def test_perfect_forecast_is_zero(self):
+        assert rmse([1, 2, 3], [1, 2, 3]) == 0.0
+
+    def test_alternating_errors_keep_their_size(self):
+        """Errors of +3, -3, +3, -3: the spread of |error| is 0, the typical error is 3."""
+        actual = [10, 10, 10, 10]
+        forecast = [13, 7, 13, 7]
+        assert float(np.std(np.abs(np.subtract(forecast, actual)))) == 0.0  # the old sigma
+        assert rmse(actual, forecast) == pytest.approx(3.0)
+
+    def test_constant_bias_counts(self):
+        """A forecast that is always 2 too high is a 2-unit error, not a 0-unit one."""
+        assert rmse([5, 5, 5], [7, 7, 7]) == pytest.approx(2.0)
+
+    def test_matches_definition(self):
+        errors = np.array([1.0, -2.0, 3.0, 0.0])
+        assert rmse(errors + 10, np.full(4, 10.0) + 0) == pytest.approx(
+            math.sqrt(np.mean(errors**2))
+        )
+
+    def test_empty_is_zero(self):
+        assert rmse([], []) == 0.0
+
+    def test_accepts_arrays_and_lists(self):
+        assert rmse(np.array([0.0, 4.0]), [2.0, 2.0]) == pytest.approx(2.0)
