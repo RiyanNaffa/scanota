@@ -24,9 +24,40 @@ class Settings(BaseSettings):
     llm_base_url: str = ""
     llm_api_key: str = ""
     llm_model_vision: str = "MiniCPM-V-4.7-35B-A3B"
+    # Backup vision model, used for a receipt when the main one fails with 5xx or a timeout
+    # (after retries). Empty = no fallback. Pick a non-thinking VLM, e.g. DeepSeek-V4.1-Flash.
+    llm_model_vision_fallback: str = ""
     llm_model_text: str = "Qwen3.8-27B"
     llm_model_light: str = "MiniCPM5-2B"
-    llm_timeout_seconds: int = 60
+    # Per-request timeout for the vision and SQL calls. Tokenfactory models idle on the shared
+    # free tier answer a first request in 35-65 s (measured), then in 1-3 s, so 60 was too tight.
+    llm_timeout_seconds: int = 120
+
+    # LLM token budget. Qwen3.8-27B thinks at xhigh when no effort is sent, which burns tokens
+    # and latency on tasks this small. reasoning_effort keeps some reasoning (SQL needs it) and
+    # max_tokens bounds it. Reasoning tokens count toward max_tokens, so a budget that is too
+    # small leaves the reply empty (finish_reason "length"; the app logs a warning).
+    # Qwen3.8-27B accepts low | medium | xhigh ("high" is a 400). Set an effort to "" to omit
+    # the parameter for servers that reject it.
+    llm_reasoning_effort_sql: str = "medium"
+    llm_reasoning_effort_text: str = "low"
+    llm_max_tokens_sql: int = 2048
+    llm_max_tokens_answer: int = 1024
+    llm_max_tokens_explain: int = 512
+
+    # LLM retry on 429 / 5xx / connection errors. Retry-After is honoured, and Tokenfactory sends
+    # 60 s for its per-minute limits, so the cap must stay above 60 or those 429s are never retried.
+    llm_max_retries: int = 3
+    llm_retry_base_seconds: float = 1.0
+    llm_retry_max_seconds: float = 65.0
+
+    # OCR endpoint (POST {LLM_BASE_URL}/ocr, MinerU2.5-Pro on AMD Tokenfactory, billed per page).
+    # The text it returns is passed to the vision model as a hint; if OCR is unavailable,
+    # extraction continues with the vision model alone. Self-hosted vLLM has no /ocr route: set
+    # false. OCR does not stream, so the timeout is generous.
+    ocr_enabled: bool = True
+    ocr_model: str = "MinerU2.5-Pro"
+    ocr_timeout_seconds: int = 60
 
     # Validation thresholds
     confidence_threshold: float = 0.85

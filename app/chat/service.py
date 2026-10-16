@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.chat.prompts import ANSWER_SYSTEM_PROMPT, SQL_SYSTEM_PROMPT
 from app.chat.sql_guard import UnsafeSQL, validate_sql
+from app.llm import call_with_retry, completion_kwargs, make_client, message_text
 
 logger = logging.getLogger(__name__)
 MAX_QUESTION_LENGTH = 500
@@ -31,15 +32,10 @@ def chat(db: Session, question: str) -> dict[str, Any]:
     if len(question) > MAX_QUESTION_LENGTH:
         raise ValueError(f"Question too long (max {MAX_QUESTION_LENGTH} characters).")
 
-    from openai import OpenAI
-
-    client = OpenAI(
-        base_url=settings.llm_base_url,
-        api_key=settings.llm_api_key,
-    )
+    client = make_client(settings)
 
     # Step 1: question → SQL
-    sql_raw = _generate_sql(client, settings.llm_model_text, question)
+    sql_raw = _generate_sql(client, settings, question)
 
     # Step 2: validate and sanitize
     try:
@@ -47,7 +43,7 @@ def chat(db: Session, question: str) -> dict[str, Any]:
     except UnsafeSQL as e:
         # Retry with error feedback
         sql_raw = _generate_sql(
-            client, settings.llm_model_text, question,
+            client, settings, question,
             error_feedback=f"SQL tidak valid: {e}. Perbaiki dan kembalikan hanya SQL SELECT."
         )
         try:
@@ -59,7 +55,7 @@ def chat(db: Session, question: str) -> dict[str, Any]:
     columns, rows = _execute_sql(db, safe_sql)
 
     # Step 4: generate answer
-    answer = _generate_answer(client, settings.llm_model_text, question, columns, rows)
+    answer = _generate_answer(client, settings, question, columns, rows)
 
     return {
         "answer": answer,
@@ -69,7 +65,7 @@ def chat(db: Session, question: str) -> dict[str, Any]:
     }
 
 
-def _generate_sql(client, model: str, question: str, error_feedback: str | None = None) -> str:
+def _generate_sql(client, settings, question: str, error_feedback: str | None = None) -> str:
     messages = [{"role": "system", "content": SQL_SYSTEM_PROMPT}]
     if error_feedback:
         messages.append({"role": "user", "content": question})
@@ -78,10 +74,18 @@ def _generate_sql(client, model: str, question: str, error_feedback: str | None 
     else:
         messages.append({"role": "user", "content": question})
 
-    resp = client.chat.completions.create(
-        model=model, messages=messages, temperature=0, timeout=30
+    # SQL correctness needs real reasoning, so this call gets the larger effort and budget.
+    resp = call_with_retry(
+        lambda: client.chat.completions.create(
+            model=settings.llm_model_text,
+            messages=messages,
+            temperature=0,
+            timeout=settings.llm_timeout_seconds,
+            **completion_kwargs(settings.llm_reasoning_effort_sql, settings.llm_max_tokens_sql),
+        ),
+        settings=settings,
     )
-    return (resp.choices[0].message.content or "").strip()
+    return message_text(resp, "SQL generation")
 
 
 def _execute_sql(db: Session, sql: str) -> tuple[list[str], list[list]]:
@@ -107,14 +111,22 @@ def _execute_sql(db: Session, sql: str) -> tuple[list[str], list[list]]:
 
 
 def _generate_answer(
-    client, model: str, question: str, columns: list[str], rows: list[list]
+    client, settings, question: str, columns: list[str], rows: list[list]
 ) -> str:
     data_str = f"Kolom: {columns}\nData ({len(rows)} baris): {rows[:20]}"
     messages = [
         {"role": "system", "content": ANSWER_SYSTEM_PROMPT},
         {"role": "user", "content": f"Pertanyaan: {question}\n\n{data_str}"},
     ]
-    resp = client.chat.completions.create(
-        model=model, messages=messages, temperature=0.2, timeout=30
+    # The data is already computed by SQL; this only phrases it, so light reasoning is enough.
+    resp = call_with_retry(
+        lambda: client.chat.completions.create(
+            model=settings.llm_model_text,
+            messages=messages,
+            temperature=0.2,
+            timeout=30,
+            **completion_kwargs(settings.llm_reasoning_effort_text, settings.llm_max_tokens_answer),
+        ),
+        settings=settings,
     )
-    return (resp.choices[0].message.content or "Tidak dapat menghasilkan jawaban.").strip()
+    return message_text(resp, "chat answer") or "Tidak dapat menghasilkan jawaban."

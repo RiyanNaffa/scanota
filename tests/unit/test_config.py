@@ -18,7 +18,7 @@ def test_defaults_load():
     assert s.match_auto_threshold == 90.0
     assert s.match_suggest_threshold == 70.0
     assert s.max_upload_mb == 10
-    assert s.llm_timeout_seconds == 60
+    assert s.llm_timeout_seconds == 120
     assert s.storage_dir == "/srv/storage"
 
 
