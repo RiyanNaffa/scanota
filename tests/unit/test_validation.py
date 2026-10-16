@@ -343,6 +343,27 @@ class TestConfidence:
         _, status = compute_confidence(issues, confidence_threshold=0.0)
         assert status == "needs_review"
 
+    def test_single_unmatched_item_needs_review(self):
+        """Regression: one unmatched item scores exactly 0.85, which used to auto-confirm."""
+        issues = [Issue(code="ITEM_UNMATCHED", severity="soft", message="x")]
+        score, status = compute_confidence(issues, confidence_threshold=0.85)
+        assert score == pytest.approx(0.85)
+        assert status == "needs_review"
+
+    def test_unmatched_forces_review_regardless_of_threshold(self):
+        issues = [Issue(code="ITEM_UNMATCHED", severity="soft", message="x")]
+        _, status = compute_confidence(issues, confidence_threshold=0.0)
+        assert status == "needs_review"
+
+    def test_other_minor_soft_issues_still_confirm(self):
+        """Only unmatched items force review; a low match or outlier above threshold passes."""
+        for code, expected in [("ITEM_LOW_MATCH", 0.95), ("PRICE_OUTLIER", 0.90)]:
+            score, status = compute_confidence(
+                [Issue(code=code, severity="soft", message="x")], confidence_threshold=0.85
+            )
+            assert score == pytest.approx(expected)
+            assert status == "confirmed"
+
     def test_unmatched_items_cap(self):
         """3 unmatched items → 3 × 0.15 = 0.45 deducted, capped at 0.45."""
         issues = [
@@ -410,6 +431,21 @@ class TestPipeline:
         assert result.status == "confirmed"
         assert result.confidence == 1.0
         assert result.items_with_matches[0].sku_id == "SMN001"
+
+    def test_unknown_item_goes_to_review_even_when_math_is_right(self):
+        extraction = {
+            "date": TODAY.isoformat(),
+            "customer": None,
+            "items": [
+                {"item_name_raw": "PSR BTN", "qty": 6, "unit": "m3",
+                 "unit_price": 345632, "line_total": 2073792},
+            ],
+            "total": 2073792,
+        }
+        result = validate_extraction(extraction, _CEMENT_CATALOG, today=TODAY)
+        assert any(i.code == "ITEM_UNMATCHED" for i in result.issues)
+        assert not any(i.severity == "hard" for i in result.issues)
+        assert result.status == "needs_review"
 
     def test_total_mismatch_needs_review(self):
         extraction = {

@@ -14,8 +14,12 @@ Deductions:
 Clamped to [0, 1].
 
 Status:
-    "needs_review" if any hard issue OR confidence < CONFIDENCE_THRESHOLD
+    "needs_review" if any hard issue OR any ITEM_UNMATCHED OR confidence < CONFIDENCE_THRESHOLD
     else "confirmed"
+
+An unmatched item has no SKU, so it would be missing from stock and forecasts. One unmatched
+item costs only 0.15, which lands exactly on the default 0.85 threshold and would be
+auto-confirmed, so it forces review regardless of the score. Fixing it in review saves an alias.
 """
 from __future__ import annotations
 
@@ -54,5 +58,6 @@ def compute_confidence(
         score -= 0.10
 
     confidence = max(0.0, min(1.0, score))
-    status = "needs_review" if has_hard or confidence < confidence_threshold else "confirmed"
+    needs_review = has_hard or unmatched_count > 0 or confidence < confidence_threshold
+    status = "needs_review" if needs_review else "confirmed"
     return confidence, status
