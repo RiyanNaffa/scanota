@@ -250,3 +250,65 @@
 - All 38 SKUs come out `ok` because the seeded stock is well above every reorder point; lower a stock level to see `order_now`
 
 ---
+
+## Forecast backtest, sigma window, z calibration – 2026-10-17
+
+**What was done**
+- `app/eval/backtest.py` (new; `make backtest` pointed at a module that did not exist): for each SKU and each of the last 26 weeks, using only earlier data, forecast, size a reorder point and compare it with the demand that really arrived during the lead time (daily dates). Scores the 4-week moving-average baseline, the old sigma and RMSE sigma over 8, 13 and 26 weeks. Cross-check: the backtest's sigma equals `forecast_sku`'s (gap 0)
+- `app/forecast/models.py`: `make_model`, `predict`, `one_step_forecasts` shared by production and the backtest; `SIGMA_LOOKBACK_WEEKS` 8 -> 26
+- README WAPE / stockout table filled from the run; `SAFETY_STOCK_Z` documented in `.env.example`
+
+**Results** (synthetic data, 38 SKUs x 26 weeks, z = 1.65, target about 5% stockouts)
+
+| method | stockout | unmet demand | avg safety stock | z needed for 5% | sigma CV |
+|---|---|---|---|---|---|
+| 4-week moving average (baseline) | 12.9% | 21.8% | 2.88 | 3.09 | 0.34 |
+| old sigma (std of abs errors, 8 wk) | 18.3% | 34.6% | 1.67 | 5.89 | 0.25 |
+| RMSE, 8 weeks | 10.0% | 14.0% | 3.51 | 2.37 | 0.17 |
+| RMSE, 13 weeks | 9.5% | 13.8% | 3.52 | 2.27 | 0.12 |
+| RMSE, 26 weeks (now) | 9.2% | 14.0% | 3.50 | 2.31 | 0.06 |
+
+- Next-week WAPE: 0.765 (statsforecast) vs 0.823 (moving average)
+- The sigma fix is what matters: stockouts 18.3% -> 10.0%, unmet demand 34.6% -> 14.0%, for about 2 more units of safety stock per SKU
+- Window length barely changes outcomes (differences are inside the noise of 988 overlapping cases), but 26 weeks is about 3x steadier than 8 (CV 0.06 vs 0.17) at the same safety stock, so the window was moved to 26. Cost: `/restock` 3 s -> 6 s
+- At z = 1.65 the stockout rate is about 9-10%, not 5%: reaching 5% takes z of about 2.3. Not changed in code because it is a cost / service-level choice (`SAFETY_STOCK_Z`)
+- Sparse SKUs (more than 40% zero weeks) are only 3 SKUs, too few to conclude anything
+
+**UNVERIFIED / open**
+- Synthetic demand (30% zero weeks, 30% noise, uniform random days) is cleaner than a real shop; the numbers check the method, not real-world accuracy
+- The lumpy-arrival effect on short lead times (most SKUs have 1-3 days) is not modelled by `z x sigma x sqrt(lead time)`; the lead<=3d split shows 9.7% vs 7.1% for longer lead times
+
+---
+
+
+## Per-category z and shelf-life warnings – 2026-10-17
+
+**What was done**
+- `app/forecast/category_policy.py` (new): z and `shelf_life_days` per category; `SAFETY_STOCK_Z` (now 2.2) is the fallback for unlisted categories. A test fails if a catalog category has no entry
+- `/restock` uses the category z and returns `z`, `shelf_life_days`, `shelf_life_risk` (`watch` above 70% of the shelf life, `high` above 100%), `shelf_life_note` and `order_capped_by_shelf_life`. The suggested order is capped to what can sell before the stock spoils. `data_quality` is unchanged
+- Restock page: "Berisiko Kedaluwarsa" metric and warning, shelf-life and risk columns, z in the detail caption
+- `app/eval/backtest.py`: per-category table, z needed for 5% / 10% per category, shrinkage toward the pooled z (`suggest_z`, k = 150), per-tier z, and an out-of-sample check (calibrate on the earlier half of the origins, score on the later half)
+
+**Why two tiers and not 13 numbers** (45 origins, 1,710 cases; calibrated on 836, scored on the other 874)
+
+| policy | stockouts overall | goods that keep (target 5%) | shelf life (target 10%) | avg safety stock |
+|---|---|---|---|---|
+| flat z = 1.65 | 9.6% | 8.5% | 13.0% | 3.51 |
+| flat z = 2.14 (pooled 5%) | 6.2% | 5.5% | 8.2% | 4.55 |
+| per tier (2.12 / 1.81) | 6.9% | 5.7% | 10.6% | 4.33 |
+| per category (shrunk) | 7.7% | 5.8% | 13.5% | 4.23 |
+
+- Per-category estimates rest on 45-225 cases (1-5 SKUs) and did not generalise: the shelf-life goods came out at 13.5% against a 10% target. One z per tier did (5.7% / 10.6%), with 5% less safety stock than a flat 2.14, which over-stocks the goods that spoil (8.2% against 10%)
+- Values used on the full period: 2.17 -> 2.2 (keeps), 1.81 -> 1.8 (shelf life). Every category has its own entry so it can be tuned once a real shop has more data
+- With these z, the production estimator on the last 26 weeks: 6.2% stockouts and 9.1% unmet demand, against 9.8% and 16.2% for the 4-week moving average at the same z (README table)
+
+**Per category at the configured z** (in-sample, 45 origins): most are at or under target. Semen is the outlier: 14.1% stockouts against 10% (15.6% at z = 1.65), Pipa & Fitting 8.9%, Alat and Kabel & Listrik 6.1% against 5%. Kayu, Keramik and Pasir & Batu are at 1.5-2.2%, i.e. over-stocked relative to target
+
+**UNVERIFIED / open**
+- Shelf lives (Semen 90 d, Semen & Plester 180 d, Cat and Waterproofing 365 d) are my rough defaults for sealed stock in a dry store, not supplier data. Confirm them
+- The warning compares days of cover with the shelf life. It cannot see how old the stock already is: receiving dates per batch are not recorded, so "nearly expired" in the strict sense is not detectable yet. A stock-receipts table would fix that
+- On the seeded stock no product is at risk (cover 38-123 days; the closest, Sika Plafon at 123 of 180 days, is just under the 70% mark). The warning path was run with in-memory stock levels (Semen Holcim 70 -> high, Sika Plafon 30 -> watch); the order cap has unit tests but never bound on real data
+- Semen could take a z above its tier value: its 90-day shelf life is about twice its ~45 days of cover, so the shelf-life limit is not what binds there. Not changed because it was not validated out of sample
+- Synthetic data, so the stockout rates check the method rather than a real shop
+
+---

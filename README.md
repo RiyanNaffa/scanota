@@ -28,13 +28,16 @@ The forecast is statistical. The LLM only explains it.
 
 - **Model:** Croston / TSB for intermittent demand (via `statsforecast`)
 - **Baseline:** 4-week moving average
-- **Safety stock:** from the distribution of forecast errors
+- **Safety stock:** `z x sigma x sqrt(lead time)`, with sigma the RMSE of the last 26 weeks of one-step forecast errors and z set per product category (2.2 for goods that keep, 1.8 for cement, paint and waterproofing, which have a shelf life)
+- **Shelf life:** for categories with a shelf life, stock that would take longer to sell than it keeps is flagged, and suggested orders are capped to what can sell in time
 - **Metric:** WAPE on a held-out backtest
 
 | Metric | scanota | Baseline |
 |---|---|---|
-| WAPE | TBD | TBD |
-| Stockout rate (simulated) | TBD | TBD |
+| WAPE (next week) | 0.77 | 0.82 |
+| Stockout rate (simulated) | 6.2% | 9.8% |
+
+Measured with `make backtest` on the synthetic data: 38 SKUs, the last 26 weeks, the same per-category z for both columns. A stockout is demand during the lead time above the reorder point. The targets are 5% for goods that keep and 10% for goods with a shelf life; z comes from the backtest and was checked on weeks it was not calibrated on (`docs/BUILD_LOG.md`). The synthetic demand is cleaner than a real shop's, so read these as a check of the method, not as a promise.
 
 ## OCR evaluation
 
@@ -88,6 +91,7 @@ docs/        Architecture, AMD proof, demo script
 ## Limitations
 
 - Very poor handwriting still needs human review; that is by design.
+- Shelf-life warnings compare days of cover with the shelf life. Stock age is not tracked (no receiving dates per batch), so a shop selling fresh food needs batch and expiry tracking first.
 - Demo data is synthetic. No real customer data is included.
 - Online ingestion is simulated through webhook and CSV, not live marketplace APIs.
 

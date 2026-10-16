@@ -59,6 +59,13 @@ backend calls the AMD Tokenfactory API instead and no vLLM container runs.
 Switch from Tokenfactory to own vLLM: change `LLM_BASE_URL` (and the model names) in `.env`, and
 set `OCR_ENABLED=false` because vLLM has no `/ocr` route. See `infra/amd/README.md`.
 
+## Forecast Policy
+
+- `statsforecast` (TSB / CrostonOptimized, chosen per SKU on a 4-week hold-out) forecasts weekly demand; short histories fall back to a 4-week moving average and `data_quality` says so.
+- Safety stock is `z x sigma x sqrt(lead time weeks)`. Sigma is the RMSE of one-step forecast errors over the last 26 weeks (`SIGMA_LOOKBACK_WEEKS`). `python -m app.eval.backtest` (`make backtest`) scores this against alternatives on the history.
+- z and shelf life are per category in `app/forecast/category_policy.py`: 2.2 for goods that keep (5% stockout target) and 1.8 for cement, paint and waterproofing (10% target). Categories not listed use `SAFETY_STOCK_Z` (2.2).
+- Shelf life: if today's stock would take longer to sell than the shelf life, `/restock` returns `shelf_life_risk` (`watch` above 70% of it, `high` above 100%) with a note, and caps the suggested order to what can sell before it spoils. This uses days of cover from the forecast; stock age is unknown because receiving dates are not recorded.
+
 ## LLM Call Policy
 
 - **Token budget:** Qwen3.8-27B thinks at `xhigh` unless told otherwise. SQL generation uses
