@@ -1,6 +1,7 @@
 """app/api/ingest.py – Ingest endpoints: online webhook, CSV, receipt."""
 from __future__ import annotations
 
+import logging
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile
@@ -8,9 +9,15 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
+from app.extraction.client import ExtractionError
 from app.ingest.online import ingest_csv, ingest_online_order
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/ingest", tags=["ingest"])
+
+EXTRACTION_UNAVAILABLE = (
+    "Model pembaca nota sedang sibuk atau tidak merespons. Tunggu sebentar lalu coba lagi."
+)
 
 
 class OnlineOrderItem(BaseModel):
@@ -80,4 +87,9 @@ async def ingest_receipt(
             detail=f"File too large. Maximum {settings.max_upload_mb} MB.",
         )
 
-    return await ingest_receipt_file(db, data, file.filename or "receipt")
+    try:
+        return await ingest_receipt_file(db, data, file.filename or "receipt")
+    except ExtractionError as exc:
+        # Provider errors can carry internal details; log them, show the user a plain message.
+        logger.warning("Receipt extraction failed: %s", exc)
+        raise HTTPException(status_code=502, detail=EXTRACTION_UNAVAILABLE) from exc

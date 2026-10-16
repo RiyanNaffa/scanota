@@ -8,26 +8,43 @@ import httpx
 
 API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
 _TIMEOUT = 30
+# Calls that wait on the LLM. Worst case for a receipt: OCR 60 s + main vision model 120 s +
+# fallback model 120 s, and a 429 may also sit out a 60 s Retry-After. Usually it takes seconds.
+_LLM_TIMEOUT = 300
 
 
-def _get(path: str, params: dict | None = None) -> Any:
+def _error(e: httpx.HTTPError) -> dict:
+    """{"error": ...} for a failed call, using the API's own `detail` message when it sent one."""
+    if isinstance(e, httpx.HTTPStatusError):
+        try:
+            detail = e.response.json().get("detail")
+        except ValueError:
+            detail = None
+        if isinstance(detail, str) and detail:
+            return {"error": detail}
+    return {"error": str(e) or type(e).__name__}
+
+
+def _get(path: str, params: dict | None = None, timeout: float = _TIMEOUT) -> Any:
     try:
-        r = httpx.get(f"{API_BASE_URL}{path}", params=params, timeout=_TIMEOUT)
+        r = httpx.get(f"{API_BASE_URL}{path}", params=params, timeout=timeout)
         r.raise_for_status()
         return r.json()
     except httpx.HTTPError as e:
-        return {"error": str(e)}
+        return _error(e)
 
 
-def _post(path: str, json: dict | None = None, files=None, data=None) -> Any:
+def _post(
+    path: str, json: dict | None = None, files=None, data=None, timeout: float = _TIMEOUT
+) -> Any:
     try:
         r = httpx.post(
-            f"{API_BASE_URL}{path}", json=json, files=files, data=data, timeout=_TIMEOUT
+            f"{API_BASE_URL}{path}", json=json, files=files, data=data, timeout=timeout
         )
         r.raise_for_status()
         return r.json()
     except httpx.HTTPError as e:
-        return {"error": str(e)}
+        return _error(e)
 
 
 def health() -> dict:
@@ -80,7 +97,7 @@ def restock(explain: str | None = None) -> list:
     params = {}
     if explain:
         params["explain"] = explain
-    return _get("/restock", params=params) or []
+    return _get("/restock", params=params, timeout=_LLM_TIMEOUT if explain else _TIMEOUT) or []
 
 
 def forecast_series(sku_id: str) -> dict:
@@ -88,11 +105,12 @@ def forecast_series(sku_id: str) -> dict:
 
 
 def chat(question: str) -> dict:
-    return _post("/chat", json={"question": question})
+    return _post("/chat", json={"question": question}, timeout=_LLM_TIMEOUT)
 
 
 def ingest_receipt(file_bytes: bytes, filename: str, content_type: str) -> dict:
     return _post(
         "/ingest/receipt",
         files={"file": (filename, file_bytes, content_type)},
+        timeout=_LLM_TIMEOUT,
     )

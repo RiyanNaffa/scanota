@@ -4,6 +4,7 @@ Saves image to storage, runs extraction, validates, persists transaction.
 """
 from __future__ import annotations
 
+import asyncio
 import os
 import uuid
 from typing import Any
@@ -48,7 +49,10 @@ async def ingest_receipt_file(
     catalog = get_catalog_aliases(db)
     price_stats = get_price_stats(db)
 
-    raw_dict, validation = extract_and_validate(image_bytes, catalog, price_stats)
+    # Blocking network calls (OCR + LLM, with retry sleeps): keep them off the event loop.
+    raw_dict, validation = await asyncio.to_thread(
+        extract_and_validate, image_bytes, catalog, price_stats
+    )
 
     tx_id = create_transaction(
         db,
