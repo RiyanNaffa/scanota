@@ -22,7 +22,17 @@ else:
     # Summary
     order_now = [i for i in items if i.get("action") == "order_now"]
     watch = [i for i in items if i.get("action") == "watch"]
-    st.metric("Perlu Dipesan Sekarang", len(order_now))
+    at_risk = [i for i in items if i.get("shelf_life_risk")]
+    m1, m2 = st.columns(2)
+    m1.metric("Perlu Dipesan Sekarang", len(order_now))
+    m2.metric("Berisiko Kedaluwarsa", len(at_risk))
+    if at_risk:
+        st.warning(
+            "Stok produk berikut diperkirakan tidak habis sebelum masa simpannya berakhir: "
+            + ", ".join(i["name"] for i in at_risk[:8])
+            + ("..." if len(at_risk) > 8 else "")
+            + ". Perkiraan ini dari kecepatan penjualan, bukan dari umur stok sebenarnya."
+        )
 
     import pandas as pd
 
@@ -35,6 +45,10 @@ else:
             "Perkiraan (2 minggu)": sum(i.get("forecast_next_2_weeks") or [0, 0]),
             "Hari Habis": f"{i['days_until_stockout']:.0f}" if i.get("days_until_stockout") else "∞",
             "Saran Pesan": i.get("suggested_order_qty", 0),
+            "Masa Simpan (hari)": i.get("shelf_life_days") or "–",
+            "Risiko Kedaluwarsa": {"high": "⚠️ Tinggi", "watch": "👀 Pantau"}.get(
+                i.get("shelf_life_risk"), ""
+            ),
             "Aksi": i.get("action", "ok"),
             "Alasan": i.get("reason", ""),
             "Model": i.get("model_used", ""),
@@ -49,7 +63,13 @@ else:
         act = item.get("action", "ok")
         with st.expander(f"{item['name']} — {act.upper()}"):
             st.write(item.get("reason", ""))
-            st.caption(f"Model: {item.get('model_used')} | WAPE: {item.get('wape_primary')}")
+            if item.get("shelf_life_note"):
+                st.warning(item["shelf_life_note"])
+            if item.get("order_capped_by_shelf_life"):
+                st.caption("Saran pesan dibatasi agar tidak melebihi yang bisa terjual sebelum masa simpan habis.")
+            st.caption(
+                f"Model: {item.get('model_used')} | WAPE: {item.get('wape_primary')} | z: {item.get('z')}"
+            )
 
             # Forecast chart
             series = api.forecast_series(item["sku_id"])

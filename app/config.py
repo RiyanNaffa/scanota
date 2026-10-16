@@ -76,8 +76,9 @@ class Settings(BaseSettings):
     evolus_enabled: bool = False
     extraction_backend: str = "direct"  # "direct" or "evolus"
 
-    # Safety stock z-score (default ~95% service level)
-    safety_stock_z: float = 1.65
+    # Safety-stock z for categories without their own entry in app/forecast/category_policy.py.
+    # 2.2 is the backtest's value for ~5 % stockouts on goods that keep (1.65 gave ~9 %).
+    safety_stock_z: float = 2.2
 
     @field_validator("confidence_threshold")
     @classmethod

@@ -59,6 +59,35 @@ def action(current_stock: float, rop: float) -> str:
     return "ok"
 
 
+def shelf_life_risk(
+    current_stock: float, weekly_forecast: float, shelf_life_days: int | None
+) -> str | None:
+    """Will today's stock sell before it spoils? 'high' if it lasts longer than the shelf life,
+    'watch' above 70 % of it, else None.
+
+    This compares days of cover with the shelf life; it does not know how old the stock already
+    is, because receiving dates per batch are not recorded.
+    """
+    if shelf_life_days is None or current_stock <= 0:
+        return None
+    cover = days_until_stockout(current_stock, weekly_forecast)
+    if cover > shelf_life_days:
+        return "high"
+    if cover > 0.7 * shelf_life_days:
+        return "watch"
+    return None
+
+
+def cap_order_for_shelf_life(
+    order_qty: int, current_stock: float, weekly_forecast: float, shelf_life_days: int | None
+) -> int:
+    """Do not order more than can be sold before the shelf life ends (stock + order <= demand)."""
+    if shelf_life_days is None:
+        return order_qty
+    sellable = weekly_forecast * shelf_life_days / 7.0
+    return max(0, min(order_qty, math.floor(sellable - current_stock)))
+
+
 def restock_reason(
     sku_name: str,
     current_stock: float,
