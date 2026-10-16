@@ -1,4 +1,5 @@
 """tests/unit/test_backtest.py – Scoring helpers of the forecast backtest, plus a small end-to-end run."""
+
 from __future__ import annotations
 
 import importlib.util
@@ -72,7 +73,9 @@ def _rows(n_weeks: int = 70) -> tuple[list[dict], dict[str, int]]:
             if rng.random() < 0.3:
                 continue
             day = start + pd.Timedelta(weeks=w, days=int(rng.integers(0, 7)))
-            rows.append({"sku_id": sku, "tx_date": str(day.date()), "qty": float(rng.integers(1, 8))})
+            rows.append(
+                {"sku_id": sku, "tx_date": str(day.date()), "qty": float(rng.integers(1, 8))}
+            )
     return rows, {"A": 2, "B": 3, "C": 5}
 
 
@@ -103,7 +106,9 @@ def _target(category: str) -> float:
     return 0.10 if category == "Spoils" else 0.05
 
 
-def _case(category: str, T: int, realised: float, base_lt: float = 10.0, scale: float = 1.0) -> dict:
+def _case(
+    category: str, T: int, realised: float, base_lt: float = 10.0, scale: float = 1.0
+) -> dict:
     return {"category": category, "T": T, "realised": realised, "base_lt": base_lt, "scale": scale}
 
 
@@ -120,7 +125,9 @@ def test_suggest_z_pulls_a_small_sample_toward_the_pooled_value():
 
 def test_suggest_z_uses_the_looser_target_for_goods_that_spoil():
     calibration = {"Spoils": {"n": 150, "z_for_5pct": 3.0, "z_for_10pct": 2.0}}
-    assert suggest_z(calibration, {0.05: 2.5, 0.10: 1.5}, _target, k=150)["Spoils"] == 1.8  # (2.0+1.5)/2 -> 1.75
+    assert (
+        suggest_z(calibration, {0.05: 2.5, 0.10: 1.5}, _target, k=150)["Spoils"] == 1.8
+    )  # (2.0+1.5)/2 -> 1.75
 
 
 def test_suggest_z_falls_back_to_pooled_when_the_own_estimate_is_infinite():

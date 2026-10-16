@@ -1,4 +1,5 @@
 """app/api/ingest.py – Ingest endpoints: online webhook, CSV, receipt."""
+
 from __future__ import annotations
 
 import logging

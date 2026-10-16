@@ -1,4 +1,5 @@
 """app/evolus/client.py – Evolus API client."""
+
 from __future__ import annotations
 
 import logging
@@ -72,7 +73,9 @@ class EvolusClient:
                 duration = time.monotonic() - start
                 logger.info(
                     "evolus op=%s status=%s duration=%.2fs",
-                    operation, resp.status_code, duration,
+                    operation,
+                    resp.status_code,
+                    duration,
                 )
                 if resp.status_code >= 500 and attempt == 0:
                     time.sleep(1)

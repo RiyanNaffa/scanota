@@ -1,4 +1,5 @@
 """tests/unit/test_config.py – Unit tests for settings loading."""
+
 from __future__ import annotations
 
 import pytest

@@ -7,6 +7,7 @@ Writes to data/sample_transactions/:
 
 Run: python -m app.synth.generate
 """
+
 from __future__ import annotations
 
 import csv
@@ -72,12 +73,21 @@ def generate_data() -> None:
     # ---- products.csv ----
     with open(os.path.join(OUTPUT_DIR, "products.csv"), "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        w.writerow(["sku_id", "name", "category", "unit", "cost_price", "current_stock", "lead_time_days"])
+        w.writerow(
+            ["sku_id", "name", "category", "unit", "cost_price", "current_stock", "lead_time_days"]
+        )
         for item in CATALOG:
-            w.writerow([
-                item.sku_id, item.name, item.category, item.unit,
-                item.price, item.initial_stock, item.lead_time_days,
-            ])
+            w.writerow(
+                [
+                    item.sku_id,
+                    item.name,
+                    item.category,
+                    item.unit,
+                    item.price,
+                    item.initial_stock,
+                    item.lead_time_days,
+                ]
+            )
 
     # ---- aliases.csv ----
     with open(os.path.join(OUTPUT_DIR, "aliases.csv"), "w", newline="", encoding="utf-8") as f:
@@ -111,15 +121,17 @@ def generate_data() -> None:
                 order_counter += 1
                 customer = rng.choice(CONTRACTORS)
                 tx_date = week_start + timedelta(days=rng.randint(0, 6))
-                online_rows.append({
-                    "external_ref": external_ref,
-                    "date": tx_date.isoformat(),
-                    "customer": customer,
-                    "item_name": rng.choice(item.aliases),
-                    "qty": qty,
-                    "unit": item.unit,
-                    "unit_price": unit_price,
-                })
+                online_rows.append(
+                    {
+                        "external_ref": external_ref,
+                        "date": tx_date.isoformat(),
+                        "customer": customer,
+                        "item_name": rng.choice(item.aliases),
+                        "qty": qty,
+                        "unit": item.unit,
+                        "unit_price": unit_price,
+                    }
+                )
             else:
                 # 1-3 offline transactions spread across the week
                 num_tx = rng.randint(1, 3)
@@ -136,41 +148,75 @@ def generate_data() -> None:
                     ref_hash = hashlib.md5(
                         f"{tx_date}{item.sku_id}{tx_i}{week_idx}".encode()
                     ).hexdigest()[:8]
-                    offline_rows.append({
-                        "date": tx_date.isoformat(),
-                        "customer": customer or "",
-                        "item_name": alias_used,
-                        "sku_id": item.sku_id,
-                        "qty": qty,
-                        "unit": item.unit,
-                        "unit_price": unit_price,
-                        "line_total": qty * unit_price,
-                        "source": "seed",
-                        "seed_ref": ref_hash,
-                    })
+                    offline_rows.append(
+                        {
+                            "date": tx_date.isoformat(),
+                            "customer": customer or "",
+                            "item_name": alias_used,
+                            "sku_id": item.sku_id,
+                            "qty": qty,
+                            "unit": item.unit,
+                            "unit_price": unit_price,
+                            "line_total": qty * unit_price,
+                            "source": "seed",
+                            "seed_ref": ref_hash,
+                        }
+                    )
                     remaining -= qty
 
     # ---- offline_history.csv ----
-    with open(os.path.join(OUTPUT_DIR, "offline_history.csv"), "w", newline="", encoding="utf-8") as f:
+    with open(
+        os.path.join(OUTPUT_DIR, "offline_history.csv"), "w", newline="", encoding="utf-8"
+    ) as f:
         w = csv.writer(f)
-        w.writerow(["date", "customer", "item_name", "sku_id", "qty", "unit",
-                    "unit_price", "line_total", "source", "seed_ref"])
+        w.writerow(
+            [
+                "date",
+                "customer",
+                "item_name",
+                "sku_id",
+                "qty",
+                "unit",
+                "unit_price",
+                "line_total",
+                "source",
+                "seed_ref",
+            ]
+        )
         for row in sorted(offline_rows, key=lambda r: r["date"]):
-            w.writerow([
-                row["date"], row["customer"], row["item_name"], row["sku_id"],
-                row["qty"], row["unit"], row["unit_price"], row["line_total"],
-                row["source"], row["seed_ref"],
-            ])
+            w.writerow(
+                [
+                    row["date"],
+                    row["customer"],
+                    row["item_name"],
+                    row["sku_id"],
+                    row["qty"],
+                    row["unit"],
+                    row["unit_price"],
+                    row["line_total"],
+                    row["source"],
+                    row["seed_ref"],
+                ]
+            )
 
     # ---- online_orders.csv ----
-    with open(os.path.join(OUTPUT_DIR, "online_orders.csv"), "w", newline="", encoding="utf-8") as f:
+    with open(
+        os.path.join(OUTPUT_DIR, "online_orders.csv"), "w", newline="", encoding="utf-8"
+    ) as f:
         w = csv.writer(f)
         w.writerow(["external_ref", "date", "customer", "item_name", "qty", "unit", "unit_price"])
         for row in sorted(online_rows, key=lambda r: r["date"]):
-            w.writerow([
-                row["external_ref"], row["date"], row["customer"],
-                row["item_name"], row["qty"], row["unit"], row["unit_price"],
-            ])
+            w.writerow(
+                [
+                    row["external_ref"],
+                    row["date"],
+                    row["customer"],
+                    row["item_name"],
+                    row["qty"],
+                    row["unit"],
+                    row["unit_price"],
+                ]
+            )
 
     print(f"Generated {len(offline_rows)} offline rows and {len(online_rows)} online rows")
     print(f"Period: {start_date} to {end_date} ({WEEKS} weeks)")

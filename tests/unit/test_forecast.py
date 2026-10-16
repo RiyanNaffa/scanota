@@ -1,4 +1,5 @@
 """tests/unit/test_forecast.py – Unit tests for forecast policy and metrics."""
+
 from __future__ import annotations
 
 import math

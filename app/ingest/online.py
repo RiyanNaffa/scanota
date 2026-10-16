@@ -3,6 +3,7 @@
 Maps the webhook payload to the internal extraction format, runs validation,
 and persists the result. Idempotent on external_ref.
 """
+
 from __future__ import annotations
 
 import csv
@@ -94,7 +95,9 @@ def ingest_online_order(
         "id": tx_id,
         "status": result.status,
         "confidence": result.confidence,
-        "issues": [{"code": i.code, "severity": i.severity, "message": i.message} for i in result.issues],
+        "issues": [
+            {"code": i.code, "severity": i.severity, "message": i.message} for i in result.issues
+        ],
         "duplicate": False,
     }
 

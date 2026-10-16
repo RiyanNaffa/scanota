@@ -1,4 +1,5 @@
 """tests/unit/test_db_url.py – Postgres URLs must select the installed psycopg 3 driver."""
+
 from __future__ import annotations
 
 import pytest

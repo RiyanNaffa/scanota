@@ -3,6 +3,7 @@
 All functions accept a SQLAlchemy Session and return plain Python dicts or None.
 No ORM models – uses raw SQL via text() to stay aligned with the schema.sql.
 """
+
 from __future__ import annotations
 
 import datetime
@@ -22,9 +23,7 @@ from app.validation.matching import normalize
 
 def get_catalog_aliases(db: Session) -> list[dict[str, Any]]:
     """Return all product aliases for matching."""
-    rows = db.execute(
-        text("SELECT alias_norm, sku_id FROM product_aliases")
-    ).fetchall()
+    rows = db.execute(text("SELECT alias_norm, sku_id FROM product_aliases")).fetchall()
     return [{"alias_norm": r[0], "sku_id": r[1]} for r in rows]
 
 
@@ -36,20 +35,47 @@ def get_products(db: Session) -> list[dict[str, Any]]:
             "current_stock, lead_time_days, created_at FROM products ORDER BY name"
         )
     ).fetchall()
-    return [_row_to_dict(r, ["sku_id", "name", "category", "unit", "cost_price",
-                               "current_stock", "lead_time_days", "created_at"]) for r in rows]
+    return [
+        _row_to_dict(
+            r,
+            [
+                "sku_id",
+                "name",
+                "category",
+                "unit",
+                "cost_price",
+                "current_stock",
+                "lead_time_days",
+                "created_at",
+            ],
+        )
+        for r in rows
+    ]
 
 
 def get_product(db: Session, sku_id: str) -> dict | None:
     row = db.execute(
-        text("SELECT sku_id, name, category, unit, cost_price, current_stock, "
-             "lead_time_days, created_at FROM products WHERE sku_id = :sku_id"),
+        text(
+            "SELECT sku_id, name, category, unit, cost_price, current_stock, "
+            "lead_time_days, created_at FROM products WHERE sku_id = :sku_id"
+        ),
         {"sku_id": sku_id},
     ).fetchone()
     if not row:
         return None
-    return _row_to_dict(row, ["sku_id", "name", "category", "unit", "cost_price",
-                               "current_stock", "lead_time_days", "created_at"])
+    return _row_to_dict(
+        row,
+        [
+            "sku_id",
+            "name",
+            "category",
+            "unit",
+            "cost_price",
+            "current_stock",
+            "lead_time_days",
+            "created_at",
+        ],
+    )
 
 
 def update_stock(db: Session, sku_id: str, current_stock: Decimal) -> bool:
@@ -244,8 +270,19 @@ def list_transactions(
         ),
         params,
     ).fetchall()
-    cols = ["id", "tx_date", "channel", "customer", "total", "source",
-            "status", "confidence", "issues", "external_ref", "created_at"]
+    cols = [
+        "id",
+        "tx_date",
+        "channel",
+        "customer",
+        "total",
+        "source",
+        "status",
+        "confidence",
+        "issues",
+        "external_ref",
+        "created_at",
+    ]
     return [_row_to_dict(r, cols) for r in rows]
 
 
@@ -262,9 +299,22 @@ def get_transaction_with_items(db: Session, tx_id: int) -> dict | None:
         return None
     tx = _row_to_dict(
         row,
-        ["id", "tx_date", "channel", "customer", "total", "source", "status",
-         "confidence", "issues", "external_ref", "receipt_image_path", "raw_extraction",
-         "created_at", "reviewed_at"],
+        [
+            "id",
+            "tx_date",
+            "channel",
+            "customer",
+            "total",
+            "source",
+            "status",
+            "confidence",
+            "issues",
+            "external_ref",
+            "receipt_image_path",
+            "raw_extraction",
+            "created_at",
+            "reviewed_at",
+        ],
     )
     items = db.execute(
         text(
@@ -274,8 +324,19 @@ def get_transaction_with_items(db: Session, tx_id: int) -> dict | None:
         {"tx_id": tx_id},
     ).fetchall()
     tx["items"] = [
-        _row_to_dict(r, ["id", "item_name_raw", "sku_id", "qty", "unit",
-                         "unit_price", "line_total", "match_score"])
+        _row_to_dict(
+            r,
+            [
+                "id",
+                "item_name_raw",
+                "sku_id",
+                "qty",
+                "unit",
+                "unit_price",
+                "line_total",
+                "match_score",
+            ],
+        )
         for r in items
     ]
     return tx
@@ -420,14 +481,8 @@ def get_summary(
         "online_count": int(kpi[2] or 0),
         "offline_count": int(kpi[3] or 0),
         "needs_review_count": int(needs_review or 0),
-        "daily_series": [
-            {"date": str(r[0]), "channel": r[1], "total": int(r[2])}
-            for r in daily
-        ],
-        "top_products": [
-            {"name": r[0] or "Unknown", "revenue": int(r[1])}
-            for r in top
-        ],
+        "daily_series": [{"date": str(r[0]), "channel": r[1], "total": int(r[2])} for r in daily],
+        "top_products": [{"name": r[0] or "Unknown", "revenue": int(r[1])} for r in top],
     }
 
 

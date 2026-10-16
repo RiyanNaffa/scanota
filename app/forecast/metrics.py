@@ -1,4 +1,5 @@
 """app/forecast/metrics.py – Forecast accuracy metrics."""
+
 from __future__ import annotations
 
 import numpy as np

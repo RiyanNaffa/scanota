@@ -1,4 +1,5 @@
 """app/api/review.py – Review and confirm endpoints."""
+
 from __future__ import annotations
 
 from typing import Annotated, Any
@@ -97,7 +98,11 @@ def confirm(
             "item_name_raw": item.item_name_raw,
             "sku_id": item.sku_id
             or next(
-                (m.sku_id for m in result.items_with_matches if m.item_name_raw == item.item_name_raw),
+                (
+                    m.sku_id
+                    for m in result.items_with_matches
+                    if m.item_name_raw == item.item_name_raw
+                ),
                 None,
             ),
             "qty": item.qty,

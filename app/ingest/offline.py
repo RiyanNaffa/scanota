@@ -2,6 +2,7 @@
 
 Saves image to storage, runs extraction, validates, persists transaction.
 """
+
 from __future__ import annotations
 
 import asyncio

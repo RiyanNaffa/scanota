@@ -1,4 +1,5 @@
 """app/api/summary.py – KPI summary endpoint."""
+
 from __future__ import annotations
 
 from typing import Annotated, Any

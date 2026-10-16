@@ -2,6 +2,7 @@
 
 Orchestrates: preprocess -> OCR (hint) -> extract (LLM) -> validate -> return result.
 """
+
 from __future__ import annotations
 
 from typing import Any

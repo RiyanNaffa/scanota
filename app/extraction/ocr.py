@@ -9,6 +9,7 @@ The docs only show an https URL, and a receipt upload has none, so the image is 
 base64 data URL. That part is UNVERIFIED: if the gateway rejects data URLs, the 4xx is logged
 (with the response body) and extraction falls back to the vision model alone.
 """
+
 from __future__ import annotations
 
 import base64
@@ -72,7 +73,8 @@ class OcrClient:
                 logger.warning(
                     "OCR endpoint %s returned %s; disabled until restart. "
                     "Set OCR_ENABLED=false if this deployment has no /ocr route.",
-                    self._url, resp.status_code,
+                    self._url,
+                    resp.status_code,
                 )
                 return None
             if resp.status_code == 429 or resp.status_code >= 500:
@@ -87,7 +89,10 @@ class OcrClient:
                     attempt += 1
                     logger.warning(
                         "OCR returned %s; retry %d/%d in %.1fs",
-                        resp.status_code, attempt, s.llm_max_retries, delay,
+                        resp.status_code,
+                        attempt,
+                        s.llm_max_retries,
+                        delay,
                     )
                     self._sleep(delay)
                     continue

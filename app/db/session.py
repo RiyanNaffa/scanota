@@ -1,4 +1,5 @@
 """app/db/session.py – SQLAlchemy engines and session dependency."""
+
 from __future__ import annotations
 
 from collections.abc import Generator

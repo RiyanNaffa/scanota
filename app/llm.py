@@ -1,4 +1,5 @@
 """app/llm.py – Shared helpers for OpenAI-compatible LLM calls: client, token budget, retry."""
+
 from __future__ import annotations
 
 import logging
@@ -141,6 +142,9 @@ def call_with_retry(
             attempt += 1
             logger.warning(
                 "LLM call failed (%s); retry %d/%d in %.1fs",
-                type(exc).__name__, attempt, retries, delay,
+                type(exc).__name__,
+                attempt,
+                retries,
+                delay,
             )
             sleep(delay)

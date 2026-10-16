@@ -8,6 +8,7 @@ Issue fields:
     message   – human-readable description
     field     – which field triggered the issue (or None)
 """
+
 from __future__ import annotations
 
 import datetime
@@ -69,7 +70,7 @@ def check_line_mismatch(items: list[dict]) -> list[Issue]:
                     code="LINE_MISMATCH",
                     severity="hard",
                     message=(
-                        f"Item {i+1} '{item.get('item_name_raw', '')}': "
+                        f"Item {i + 1} '{item.get('item_name_raw', '')}': "
                         f"qty {qty} × price {unit_price} = {float(computed):,.0f} "
                         f"but line_total is {line_total}"
                     ),
@@ -89,7 +90,9 @@ def check_date(
     issues: list[Issue] = []
 
     if not date_str:
-        return [Issue(code="DATE_INVALID", severity="hard", message="Date is missing", field="date")]
+        return [
+            Issue(code="DATE_INVALID", severity="hard", message="Date is missing", field="date")
+        ]
 
     try:
         tx_date = datetime.date.fromisoformat(str(date_str))
@@ -147,7 +150,7 @@ def check_qty_invalid(items: list[dict]) -> list[Issue]:
                 Issue(
                     code="QTY_INVALID",
                     severity="hard",
-                    message=f"Item {i+1} has invalid qty: {qty!r}",
+                    message=f"Item {i + 1} has invalid qty: {qty!r}",
                     field=f"items[{i}].qty",
                 )
             )
@@ -182,7 +185,7 @@ def check_price_outlier(
                     code="PRICE_OUTLIER",
                     severity="soft",
                     message=(
-                        f"Item {i+1} '{item.get('item_name_raw', '')}' unit_price "
+                        f"Item {i + 1} '{item.get('item_name_raw', '')}' unit_price "
                         f"{unit_price:,} is outside 0.5×–2× historical median "
                         f"{median:,.0f}"
                     ),

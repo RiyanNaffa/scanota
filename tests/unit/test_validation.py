@@ -3,6 +3,7 @@
 Covers: parse_rupiah, rules, matching, confidence. >= 40 test cases.
 No network, no database required.
 """
+
 from __future__ import annotations
 
 import datetime
@@ -376,8 +377,7 @@ class TestConfidence:
     def test_low_match_cap(self):
         """5 low-match items → 5 × 0.05 = 0.25 but cap is 0.20."""
         issues = [
-            Issue(code="ITEM_LOW_MATCH", severity="soft", message=f"item {i}")
-            for i in range(5)
+            Issue(code="ITEM_LOW_MATCH", severity="soft", message=f"item {i}") for i in range(5)
         ]
         score, _ = compute_confidence(issues, confidence_threshold=0.0)
         assert score == pytest.approx(1.0 - 0.20)
@@ -437,8 +437,13 @@ class TestPipeline:
             "date": TODAY.isoformat(),
             "customer": None,
             "items": [
-                {"item_name_raw": "PSR BTN", "qty": 6, "unit": "m3",
-                 "unit_price": 345632, "line_total": 2073792},
+                {
+                    "item_name_raw": "PSR BTN",
+                    "qty": 6,
+                    "unit": "m3",
+                    "unit_price": 345632,
+                    "line_total": 2073792,
+                },
             ],
             "total": 2073792,
         }
@@ -451,7 +456,9 @@ class TestPipeline:
         extraction = {
             "date": TODAY.isoformat(),
             "customer": "x",
-            "items": [{"item_name_raw": "SMN 3R", "qty": 1, "unit_price": 70000, "line_total": 70000}],
+            "items": [
+                {"item_name_raw": "SMN 3R", "qty": 1, "unit_price": 70000, "line_total": 70000}
+            ],
             "total": 99999,  # wrong
         }
         result = validate_extraction(extraction, _CEMENT_CATALOG, today=TODAY)

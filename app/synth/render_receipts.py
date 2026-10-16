@@ -4,6 +4,7 @@ Renders receipts from a subset of offline_history.csv into data/sample_receipts/
 Includes ground_truth.json and realistic degradation.
 5 receipts are intentionally wrong (total != sum of items).
 """
+
 from __future__ import annotations
 
 import csv
@@ -62,7 +63,9 @@ def _render_receipt(items: list[dict], meta: dict, intentional_error: bool) -> I
     # Header
     draw.text((width // 2 - 80, y), "TOKO BANGUNAN JAYA", font=font_bold, fill=30, anchor="lt")
     y += line_height
-    draw.text((width // 2 - 60, y), "Jl. Raya No. 123, Jakarta", font=font_small, fill=60, anchor="lt")
+    draw.text(
+        (width // 2 - 60, y), "Jl. Raya No. 123, Jakarta", font=font_small, fill=60, anchor="lt"
+    )
     y += line_height
     draw.text((padding, y), f"Tgl: {meta['date']}", font=font_normal, fill=30)
     draw.text((width - padding - 120, y), f"No: {meta['nota_no']}", font=font_normal, fill=30)
@@ -87,7 +90,8 @@ def _render_receipt(items: list[dict], meta: dict, intentional_error: bool) -> I
         draw.text(
             (padding + 10, y),
             f"{qty} {unit} x Rp{price:,} = Rp{lt:,}",
-            font=font_small, fill=50,
+            font=font_small,
+            fill=50,
         )
         y += line_height + 2
 
@@ -184,7 +188,7 @@ def render_receipts() -> None:
         else:
             display_total = true_total
 
-        nota_no = f"N{i+1:04d}"
+        nota_no = f"N{i + 1:04d}"
         meta = {
             "date": group[0]["date"],
             "customer": group[0]["customer"] or None,
@@ -195,7 +199,7 @@ def render_receipts() -> None:
         receipt_img = _render_receipt(items, meta, intentional_error)
         receipt_img = _degrade_image(receipt_img, rng)
 
-        filename = f"receipt_{i+1:04d}.png"
+        filename = f"receipt_{i + 1:04d}.png"
         filepath = os.path.join(OUTPUT_DIR, filename)
         receipt_img.save(filepath, "PNG", optimize=True)
 
@@ -205,15 +209,17 @@ def render_receipts() -> None:
             receipt_img = receipt_img.resize((w // 2, h // 2), Image.LANCZOS)
             receipt_img.save(filepath, "PNG", optimize=True)
 
-        ground_truth.append({
-            "filename": filename,
-            "date": group[0]["date"],
-            "customer": group[0]["customer"] or None,
-            "items": items,
-            "total": display_total,
-            "true_total": true_total,
-            "intentional_error": intentional_error,
-        })
+        ground_truth.append(
+            {
+                "filename": filename,
+                "date": group[0]["date"],
+                "customer": group[0]["customer"] or None,
+                "items": items,
+                "total": display_total,
+                "true_total": true_total,
+                "intentional_error": intentional_error,
+            }
+        )
 
     with open(os.path.join(OUTPUT_DIR, "ground_truth.json"), "w", encoding="utf-8") as f:
         json.dump(ground_truth, f, ensure_ascii=False, indent=2)

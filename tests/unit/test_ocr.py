@@ -1,4 +1,5 @@
 """tests/unit/test_ocr.py – OCR hint client (httpx mocked, no network)."""
+
 from __future__ import annotations
 
 import json

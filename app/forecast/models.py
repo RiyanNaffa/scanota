@@ -4,6 +4,7 @@ Wraps TSB, CrostonOptimized, and WindowAverage.
 Chooses best model per SKU by lowest rolling-origin WAPE.
 Falls back to WindowAverage for SKUs with < 8 weeks of history.
 """
+
 from __future__ import annotations
 
 import functools
@@ -39,6 +40,7 @@ def _try_import_statsforecast():
             CrostonOptimized,
             WindowAverage,
         )
+
         return StatsForecast, TSB, CrostonOptimized, WindowAverage
     except ImportError as exc:
         # Never stay silent: without statsforecast every SKU quietly gets the moving average.
@@ -61,11 +63,13 @@ def make_model(name: str):
 def predict(name: str, values: np.ndarray, index: pd.PeriodIndex, h: int) -> np.ndarray:
     """Fit the named model on `values` (weekly, aligned with `index`) and forecast h weeks."""
     StatsForecast, *_ = _try_import_statsforecast()
-    df = pd.DataFrame({
-        "unique_id": ["sku"] * len(values),
-        "ds": [p.to_timestamp() for p in index[: len(values)]],
-        "y": values,
-    })
+    df = pd.DataFrame(
+        {
+            "unique_id": ["sku"] * len(values),
+            "ds": [p.to_timestamp() for p in index[: len(values)]],
+            "y": values,
+        }
+    )
     fc = StatsForecast(models=[make_model(name)], freq="W", n_jobs=1).forecast(df=df, h=h)
     col = [c for c in fc.columns if c not in ("unique_id", "ds")][0]
     return fc[col].values.astype(float)
@@ -145,7 +149,8 @@ def forecast_sku(
         return {
             "forecast": [avg] * horizon,
             "model_used": (
-                "WindowAverage(statsforecast_unavailable)" if unavailable
+                "WindowAverage(statsforecast_unavailable)"
+                if unavailable
                 else "WindowAverage(fallback)"
             ),
             "sigma": sigma,
@@ -177,16 +182,19 @@ def forecast_sku(
 
         for name, mdl in candidates:
             try:
-                df_train = pd.DataFrame({
-                    "unique_id": ["sku"] * len(train_y),
-                    "ds": [p.to_timestamp() for p in series.index[:len(train_y)]],
-                    "y": train_y,
-                })
+                df_train = pd.DataFrame(
+                    {
+                        "unique_id": ["sku"] * len(train_y),
+                        "ds": [p.to_timestamp() for p in series.index[: len(train_y)]],
+                        "y": train_y,
+                    }
+                )
                 sf = StatsForecast(models=[mdl], freq="W", n_jobs=1)
                 fc = sf.forecast(df=df_train, h=hold_out)
                 col = [c for c in fc.columns if c not in ("unique_id", "ds")][0]
                 pred = fc[col].values
                 from app.forecast.metrics import wape as _wape
+
                 w = _wape(test_y, pred)
                 if w < best_wape:
                     best_wape = w
@@ -196,15 +204,18 @@ def forecast_sku(
 
         # Baseline WAPE
         try:
-            df_train = pd.DataFrame({
-                "unique_id": ["sku"] * len(train_y),
-                "ds": [p.to_timestamp() for p in series.index[:len(train_y)]],
-                "y": train_y,
-            })
+            df_train = pd.DataFrame(
+                {
+                    "unique_id": ["sku"] * len(train_y),
+                    "ds": [p.to_timestamp() for p in series.index[: len(train_y)]],
+                    "y": train_y,
+                }
+            )
             sf_base = StatsForecast(models=[baseline], freq="W", n_jobs=1)
             fc_base = sf_base.forecast(df=df_train, h=hold_out)
             col = [c for c in fc_base.columns if c not in ("unique_id", "ds")][0]
             from app.forecast.metrics import wape as _wape
+
             baseline_wape = _wape(test_y, fc_base[col].values)
         except Exception:
             pass
@@ -213,11 +224,13 @@ def forecast_sku(
         model_map = {"TSB": TSB(alpha_d=0.2, alpha_p=0.2), "CrostonOptimized": CrostonOptimized()}
         chosen = model_map.get(best_model_name, WindowAverage(window_size=WINDOW_SIZE))
 
-        df_full = pd.DataFrame({
-            "unique_id": ["sku"] * n,
-            "ds": [p.to_timestamp() for p in series.index],
-            "y": values,
-        })
+        df_full = pd.DataFrame(
+            {
+                "unique_id": ["sku"] * n,
+                "ds": [p.to_timestamp() for p in series.index],
+                "y": values,
+            }
+        )
         sf_final = StatsForecast(models=[chosen], freq="W", n_jobs=1)
         fc_final = sf_final.forecast(df=df_full, h=horizon)
         col = [c for c in fc_final.columns if c not in ("unique_id", "ds")][0]

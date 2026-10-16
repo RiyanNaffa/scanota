@@ -1,4 +1,5 @@
 """tests/unit/test_chat_budget.py – Chat calls carry the reasoning/token budget from settings."""
+
 from __future__ import annotations
 
 from types import SimpleNamespace

@@ -4,6 +4,7 @@ Idempotent: uses ON CONFLICT DO NOTHING / DO UPDATE and skips existing external_
 
 Run: python -m app.db.seed
 """
+
 from __future__ import annotations
 
 import csv
@@ -35,8 +36,14 @@ def seed() -> None:
         db.commit()
         logger.info("Products and aliases seeded.")
 
-        _seed_transactions(db, get_catalog_aliases, get_price_stats, create_transaction,
-                           get_transaction_by_external_ref, validate_extraction)
+        _seed_transactions(
+            db,
+            get_catalog_aliases,
+            get_price_stats,
+            create_transaction,
+            get_transaction_by_external_ref,
+            validate_extraction,
+        )
     finally:
         db.close()
 
@@ -44,20 +51,25 @@ def seed() -> None:
 def _seed_products(db, upsert_product, add_alias) -> None:
     products_path = os.path.join(DATA_DIR, "products.csv")
     if not os.path.exists(products_path):
-        logger.warning("products.csv not found, skipping. Run `python -m app.synth.generate` first.")
+        logger.warning(
+            "products.csv not found, skipping. Run `python -m app.synth.generate` first."
+        )
         return
 
     with open(products_path, encoding="utf-8") as f:
         for row in csv.DictReader(f):
-            upsert_product(db, {
-                "sku_id": row["sku_id"],
-                "name": row["name"],
-                "category": row["category"],
-                "unit": row["unit"],
-                "cost_price": int(row["cost_price"]) if row["cost_price"] else None,
-                "current_stock": float(row["current_stock"]),
-                "lead_time_days": int(row["lead_time_days"]),
-            })
+            upsert_product(
+                db,
+                {
+                    "sku_id": row["sku_id"],
+                    "name": row["name"],
+                    "category": row["category"],
+                    "unit": row["unit"],
+                    "cost_price": int(row["cost_price"]) if row["cost_price"] else None,
+                    "current_stock": float(row["current_stock"]),
+                    "lead_time_days": int(row["lead_time_days"]),
+                },
+            )
 
     aliases_path = os.path.join(DATA_DIR, "aliases.csv")
     if os.path.exists(aliases_path):
@@ -69,8 +81,12 @@ def _seed_products(db, upsert_product, add_alias) -> None:
 
 
 def _seed_transactions(
-    db, get_catalog_aliases, get_price_stats, create_transaction,
-    get_transaction_by_external_ref, validate_extraction,
+    db,
+    get_catalog_aliases,
+    get_price_stats,
+    create_transaction,
+    get_transaction_by_external_ref,
+    validate_extraction,
 ) -> None:
     catalog = get_catalog_aliases(db)
     price_stats = get_price_stats(db)
@@ -98,13 +114,15 @@ def _seed_transactions(
                 }
             qty = float(row["qty"])
             unit_price = int(row["unit_price"])
-            orders[ref]["items"].append({
-                "item_name_raw": row["item_name"],
-                "qty": qty,
-                "unit": row.get("unit"),
-                "unit_price": unit_price,
-                "line_total": round(qty) * unit_price,
-            })
+            orders[ref]["items"].append(
+                {
+                    "item_name_raw": row["item_name"],
+                    "qty": qty,
+                    "unit": row.get("unit"),
+                    "unit_price": unit_price,
+                    "line_total": round(qty) * unit_price,
+                }
+            )
 
         for ref, order in orders.items():
             if get_transaction_by_external_ref(db, ref):
@@ -208,7 +226,9 @@ def _seed_transactions(
 
     logger.info(
         "Seed complete: online=%d, offline=%d, skipped=%d",
-        online_count, offline_count, skipped,
+        online_count,
+        offline_count,
+        skipped,
     )
 
 

@@ -13,6 +13,7 @@ Policy:
     - Strip comments
     - Append LIMIT 200 if absent; cap at 200
 """
+
 from __future__ import annotations
 
 import re
@@ -30,11 +31,21 @@ MAX_LIMIT = 200
 DEFAULT_LIMIT = 200
 
 DENY_FUNCTIONS = {
-    "pg_sleep", "pg_read_file", "pg_read_binary_file",
-    "lo_import", "lo_export", "lo_get", "lo_put",
-    "dblink", "dblink_exec", "set_config", "current_setting",
-    "pg_cancel_backend", "pg_terminate_backend",
-    "copy_file_range", "pg_ls_dir",
+    "pg_sleep",
+    "pg_read_file",
+    "pg_read_binary_file",
+    "lo_import",
+    "lo_export",
+    "lo_get",
+    "lo_put",
+    "dblink",
+    "dblink_exec",
+    "set_config",
+    "current_setting",
+    "pg_cancel_backend",
+    "pg_terminate_backend",
+    "copy_file_range",
+    "pg_ls_dir",
 }
 
 
@@ -82,8 +93,14 @@ def validate_sql(sql: str) -> str:
 
     # No DML/DDL inside (catches UPDATE/DELETE/INSERT/CREATE/DROP/TRUNCATE/ALTER)
     for bad_type in (
-        exp.Insert, exp.Update, exp.Delete, exp.Drop, exp.Create,
-        exp.Alter, exp.Command, exp.TruncateTable,
+        exp.Insert,
+        exp.Update,
+        exp.Delete,
+        exp.Drop,
+        exp.Create,
+        exp.Alter,
+        exp.Command,
+        exp.TruncateTable,
     ):
         if stmt.find(bad_type):
             raise UnsafeSQL(f"DML/DDL not allowed: {bad_type.__name__}")

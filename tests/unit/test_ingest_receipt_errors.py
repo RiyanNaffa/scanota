@@ -1,4 +1,5 @@
 """tests/unit/test_ingest_receipt_errors.py – A failed extraction is a 502 with a plain message."""
+
 from __future__ import annotations
 
 import io
@@ -18,7 +19,9 @@ from app.extraction.client import ExtractionError
 @pytest.fixture(autouse=True)
 def _configured_llm(monkeypatch):
     monkeypatch.setattr(
-        config, "_settings", Settings(_env_file=None, llm_base_url="http://llm.test/v1", llm_api_key="k")
+        config,
+        "_settings",
+        Settings(_env_file=None, llm_base_url="http://llm.test/v1", llm_api_key="k"),
     )
 
 
@@ -29,7 +32,9 @@ def _stub_offline(monkeypatch, fn):
 
 def _upload() -> UploadFile:
     return UploadFile(
-        io.BytesIO(b"jpegbytes"), filename="nota.jpg", headers=Headers({"content-type": "image/jpeg"})
+        io.BytesIO(b"jpegbytes"),
+        filename="nota.jpg",
+        headers=Headers({"content-type": "image/jpeg"}),
     )
 
 

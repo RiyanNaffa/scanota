@@ -1,4 +1,5 @@
 """tests/unit/test_category_policy.py – Per-category z and shelf life."""
+
 from __future__ import annotations
 
 import csv

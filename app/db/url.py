@@ -1,4 +1,5 @@
 """app/db/url.py – Turn a plain Postgres URL into a SQLAlchemy URL for the psycopg 3 driver."""
+
 from __future__ import annotations
 
 
@@ -11,5 +12,5 @@ def to_sqlalchemy_url(url: str) -> str:
     """
     for prefix in ("postgresql://", "postgres://"):
         if url.startswith(prefix):
-            return "postgresql+psycopg://" + url[len(prefix):]
+            return "postgresql+psycopg://" + url[len(prefix) :]
     return url

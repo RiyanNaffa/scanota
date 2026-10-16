@@ -10,6 +10,7 @@ Pipeline:
 
 Any step failure falls back to the original image bytes.
 """
+
 from __future__ import annotations
 
 import logging
@@ -101,7 +102,9 @@ def _deskew(gray: np.ndarray) -> np.ndarray:
         center = (w // 2, h // 2)
         M = cv2.getRotationMatrix2D(center, median_angle, 1.0)
         rotated = cv2.warpAffine(
-            gray, M, (w, h),
+            gray,
+            M,
+            (w, h),
             flags=cv2.INTER_LINEAR,
             borderMode=cv2.BORDER_REPLICATE,
         )

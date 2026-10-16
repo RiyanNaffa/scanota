@@ -1,4 +1,5 @@
 """tests/unit/test_extraction_client.py – ExtractionClient with a fake SDK client."""
+
 from __future__ import annotations
 
 import json

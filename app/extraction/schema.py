@@ -1,4 +1,5 @@
 """app/extraction/schema.py – Pydantic models for OCR extraction results."""
+
 from __future__ import annotations
 
 from typing import Any

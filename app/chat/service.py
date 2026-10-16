@@ -1,4 +1,5 @@
 """app/chat/service.py – Text-to-SQL chat service."""
+
 from __future__ import annotations
 
 import logging
@@ -43,8 +44,10 @@ def chat(db: Session, question: str) -> dict[str, Any]:
     except UnsafeSQL as e:
         # Retry with error feedback
         sql_raw = _generate_sql(
-            client, settings, question,
-            error_feedback=f"SQL tidak valid: {e}. Perbaiki dan kembalikan hanya SQL SELECT."
+            client,
+            settings,
+            question,
+            error_feedback=f"SQL tidak valid: {e}. Perbaiki dan kembalikan hanya SQL SELECT.",
         )
         try:
             safe_sql = validate_sql(sql_raw)
@@ -110,9 +113,7 @@ def _execute_sql(db: Session, sql: str) -> tuple[list[str], list[list]]:
         raise ValueError(f"SQL execution error: {e}") from e
 
 
-def _generate_answer(
-    client, settings, question: str, columns: list[str], rows: list[list]
-) -> str:
+def _generate_answer(client, settings, question: str, columns: list[str], rows: list[list]) -> str:
     data_str = f"Kolom: {columns}\nData ({len(rows)} baris): {rows[:20]}"
     messages = [
         {"role": "system", "content": ANSWER_SYSTEM_PROMPT},

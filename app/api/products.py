@@ -1,4 +1,5 @@
 """app/api/products.py – Product master endpoints."""
+
 from __future__ import annotations
 
 from decimal import Decimal

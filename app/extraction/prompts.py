@@ -1,4 +1,5 @@
 """app/extraction/prompts.py – LLM prompts for receipt extraction."""
+
 from __future__ import annotations
 
 SYSTEM_PROMPT = """You are a precise data-entry assistant for Indonesian shop receipts (nota), which may be

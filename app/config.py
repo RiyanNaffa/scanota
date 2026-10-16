@@ -1,4 +1,5 @@
 """app/config.py – Application settings via pydantic-settings."""
+
 from __future__ import annotations
 
 from pydantic import field_validator

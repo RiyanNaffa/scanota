@@ -21,6 +21,7 @@ An unmatched item has no SKU, so it would be missing from stock and forecasts. O
 item costs only 0.15, which lands exactly on the default 0.85 threshold and would be
 auto-confirmed, so it forces review regardless of the score. Fixing it in review saves an alias.
 """
+
 from __future__ import annotations
 
 from app.validation.rules import Issue

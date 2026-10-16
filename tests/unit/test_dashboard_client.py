@@ -1,4 +1,5 @@
 """tests/unit/test_dashboard_client.py – Dashboard shows the API's own error message."""
+
 from __future__ import annotations
 
 import httpx

@@ -10,6 +10,7 @@ match_item(name, catalog_aliases) -> MatchResult
         "suggest" if score >= MATCH_SUGGEST_THRESHOLD
         "none"    otherwise
 """
+
 from __future__ import annotations
 
 import re
@@ -100,7 +101,7 @@ def build_issue_from_match(
             Issue(
                 code="ITEM_UNMATCHED",
                 severity="soft",
-                message=f"Item {item_index+1} '{item_name_raw}' could not be matched to any SKU",
+                message=f"Item {item_index + 1} '{item_name_raw}' could not be matched to any SKU",
                 field=f"items[{item_index}].item_name_raw",
             )
         )
@@ -110,7 +111,7 @@ def build_issue_from_match(
                 code="ITEM_LOW_MATCH",
                 severity="soft",
                 message=(
-                    f"Item {item_index+1} '{item_name_raw}' matched to SKU "
+                    f"Item {item_index + 1} '{item_name_raw}' matched to SKU "
                     f"'{match.sku_id}' with low confidence (score={match.score:.0f})"
                 ),
                 field=f"items[{item_index}].item_name_raw",

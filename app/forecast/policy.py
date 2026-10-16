@@ -2,6 +2,7 @@
 
 All inputs/outputs are plain Python numbers. No database, no ORM.
 """
+
 from __future__ import annotations
 
 import math

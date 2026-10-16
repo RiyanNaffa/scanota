@@ -14,6 +14,7 @@ Categories not listed here use SAFETY_STOCK_Z (also the durable value) and have 
 Shelf lives are rough defaults for sealed stock in a dry store: confirm them against the
 supplier's label before relying on the warnings.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -25,7 +26,9 @@ class CategoryPolicy:
     shelf_life_days: int | None = None  # None = does not spoil in practice
 
 
-DURABLE_Z = 2.2  # backtest: 5 % stockouts needs z of 2.17 on the full period (2.12 on the earlier half)
+DURABLE_Z = (
+    2.2  # backtest: 5 % stockouts needs z of 2.17 on the full period (2.12 on the earlier half)
+)
 SHELF_LIFE_Z = 1.8  # backtest: 10 % stockouts needs 1.81 (1.81 on the earlier half)
 
 CATEGORY_POLICY: dict[str, CategoryPolicy] = {

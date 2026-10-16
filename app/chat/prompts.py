@@ -1,4 +1,5 @@
 """app/chat/prompts.py – Prompts for text-to-SQL chat."""
+
 from __future__ import annotations
 
 SQL_SYSTEM_PROMPT = """Kamu adalah asisten analitik data untuk toko bangunan Indonesia.

@@ -1,4 +1,5 @@
 """tests/integration/test_health.py – Integration test for the health endpoint."""
+
 from __future__ import annotations
 
 import pytest

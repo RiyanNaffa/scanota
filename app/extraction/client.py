@@ -5,6 +5,7 @@ Transient API errors (429, 5xx) are retried with backoff in app.llm; if the visi
 still down (5xx or timeout) the optional LLM_MODEL_VISION_FALLBACK model takes over. On a
 parse/validation failure the model gets one more try with the error message appended.
 """
+
 from __future__ import annotations
 
 import base64
@@ -70,9 +71,7 @@ class ExtractionClient:
         """
         b64 = base64.b64encode(image_bytes).decode("utf-8")
         image_url = f"data:image/jpeg;base64,{b64}"
-        user_prompt = (
-            USER_PROMPT_WITH_OCR.format(ocr_text=ocr_text) if ocr_text else USER_PROMPT
-        )
+        user_prompt = USER_PROMPT_WITH_OCR.format(ocr_text=ocr_text) if ocr_text else USER_PROMPT
 
         messages = [
             {"role": "system", "content": SYSTEM_PROMPT},
@@ -102,16 +101,12 @@ class ExtractionClient:
 
         # Retry with error feedback
         messages.append({"role": "assistant", "content": raw_text})
-        messages.append(
-            {"role": "user", "content": RETRY_PROMPT_TEMPLATE.format(error=error_msg)}
-        )
+        messages.append({"role": "user", "content": RETRY_PROMPT_TEMPLATE.format(error=error_msg)})
         try:
             raw_text2 = self._call_llm(messages)
             return self._parse_response(raw_text2)
         except Exception as exc2:
-            raise ExtractionError(
-                f"Receipt extraction failed after retry: {exc2}"
-            ) from exc2
+            raise ExtractionError(f"Receipt extraction failed after retry: {exc2}") from exc2
 
     def _call_llm(self, messages: list) -> str:
         """Call the vision model, switching to the fallback if it is down (5xx or timeout).
@@ -128,7 +123,9 @@ class ExtractionClient:
                 raise
             logger.warning(
                 "Vision model %s unavailable (%s); falling back to %s",
-                self._model, type(exc).__name__, self._fallback,
+                self._model,
+                type(exc).__name__,
+                self._fallback,
             )
             self._on_fallback = True
             return self._complete(self._fallback, messages)

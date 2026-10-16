@@ -2,6 +2,7 @@
 
 validate_extraction(extraction, catalog, price_stats, today) -> ValidationResult
 """
+
 from __future__ import annotations
 
 import datetime
@@ -86,9 +87,7 @@ def validate_extraction(
         item = dict(item)
         item["sku_id"] = match.sku_id
 
-        issues += build_issue_from_match(
-            item.get("item_name_raw", ""), match, item_index=i
-        )
+        issues += build_issue_from_match(item.get("item_name_raw", ""), match, item_index=i)
         items_with_matches.append(
             ItemWithMatch(
                 item_name_raw=item.get("item_name_raw", ""),

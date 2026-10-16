@@ -13,6 +13,7 @@ Several sigma estimators are scored side by side, plus the 4-week moving-average
 choice of estimator rests on numbers. The data is synthetic (app/synth/generate.py: 30 % zero
 weeks, 30 % noise), so the results show how the method behaves on that process, not on a real shop.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -77,9 +78,16 @@ def _category_calibration(rows: list[dict[str, Any]]) -> dict[str, dict[str, flo
     out: dict[str, dict[str, float]] = {}
     for cat in sorted({r["category"] for r in rows}):
         sel = [r for r in rows if r["category"] == cat]
-        cols = ([r["base_lt"] for r in sel], [r["scale"] for r in sel], [r["realised"] for r in sel])
-        out[cat] = {"n": len(sel), "z_for_5pct": z_for_target(*cols, target=0.05),
-                    "z_for_10pct": z_for_target(*cols, target=0.10)}
+        cols = (
+            [r["base_lt"] for r in sel],
+            [r["scale"] for r in sel],
+            [r["realised"] for r in sel],
+        )
+        out[cat] = {
+            "n": len(sel),
+            "z_for_5pct": z_for_target(*cols, target=0.05),
+            "z_for_10pct": z_for_target(*cols, target=0.10),
+        }
     return out
 
 
@@ -119,7 +127,11 @@ def tier_z(rows: list[dict[str, Any]], target_of: Callable[[str], float]) -> dic
     out: dict[str, float] = {}
     for tier, target in (("durable", 0.05), ("shelf_life", 0.10)):
         sel = [r for r in rows if (target_of(r["category"]) > 0.05) == (tier == "shelf_life")]
-        cols = ([r["base_lt"] for r in sel], [r["scale"] for r in sel], [r["realised"] for r in sel])
+        cols = (
+            [r["base_lt"] for r in sel],
+            [r["scale"] for r in sel],
+            [r["realised"] for r in sel],
+        )
         out[tier] = z_for_target(*cols, target=target) if sel else 0.0
     return out
 
@@ -127,7 +139,9 @@ def tier_z(rows: list[dict[str, Any]], target_of: Callable[[str], float]) -> dic
 def _miss_rate(rows: list[dict[str, Any]], z_of: Callable[[str], float]) -> float:
     if not rows:
         return 0.0
-    return float(np.mean([r["realised"] > r["base_lt"] + z_of(r["category"]) * r["scale"] for r in rows]))
+    return float(
+        np.mean([r["realised"] > r["base_lt"] + z_of(r["category"]) * r["scale"] for r in rows])
+    )
 
 
 def holdout_check(
@@ -156,8 +170,10 @@ def holdout_check(
         f"per tier ({tz['durable']:.2f} / {tz['shelf_life']:.2f})": by_tier,
         "per category": lambda c: z_cat.get(c, flat),
     }
-    tiers = {"durable": [r for r in test if target_of(r["category"]) <= 0.05],
-             "shelf_life": [r for r in test if target_of(r["category"]) > 0.05]}
+    tiers = {
+        "durable": [r for r in test if target_of(r["category"]) <= 0.05],
+        "shelf_life": [r for r in test if target_of(r["category"]) > 0.05],
+    }
     out: dict[str, dict[str, float]] = {}
     for name, z_of in policies.items():
         out[name] = {
@@ -166,8 +182,13 @@ def holdout_check(
             "shelf_life": _miss_rate(tiers["shelf_life"], z_of),
             "avg_safety_stock": float(np.mean([z_of(r["category"]) * r["scale"] for r in test])),
         }
-    return {"calibrated_on_cases": len(train), "scored_on_cases": len(test),
-            "z_by_category": z_cat, "tier_z": tz, "policies": out}
+    return {
+        "calibrated_on_cases": len(train),
+        "scored_on_cases": len(test),
+        "z_by_category": z_cat,
+        "tier_z": tz,
+        "policies": out,
+    }
 
 
 def lead_time_demand(daily: pd.Series, start: pd.Timestamp, lead_days: int) -> float:
@@ -243,19 +264,32 @@ def run_backtest(
                 continue
             weekly_fc = sum(fc["forecast"]) / len(fc["forecast"])
             sig = _window_sigmas(pre[fc["model_used"]], values, T)
-            ma4 = float(np.mean(values[T - models.WINDOW_SIZE:T]))
-            sig["baseline_ma4"] = float(np.std(values[T - models.WINDOW_SIZE:T]))
-            sigma_mismatch = max(sigma_mismatch, abs(fc["sigma"] - sig[f"rmse{models.SIGMA_LOOKBACK_WEEKS}"]))
+            ma4 = float(np.mean(values[T - models.WINDOW_SIZE : T]))
+            sig["baseline_ma4"] = float(np.std(values[T - models.WINDOW_SIZE : T]))
+            sigma_mismatch = max(
+                sigma_mismatch, abs(fc["sigma"] - sig[f"rmse{models.SIGMA_LOOKBACK_WEEKS}"])
+            )
             realised = lead_time_demand(daily_by_sku[sku], s.index[T].start_time, lead)
 
             for m in methods:
                 base = ma4 if m == "baseline_ma4" else weekly_fc
                 rop = base * lt_wks + safety_stock(sig[m], lt_wks, z=z_sku)
-                records.append({"sku": sku, "T": T, "method": m, "rop": rop,
-                                "ss": rop - base * lt_wks, "base_lt": base * lt_wks,
-                                "scale": sig[m] * math.sqrt(lt_wks), "lead": lead,
-                                "realised": realised, "sparse": sparse,
-                                "category": category, "z": z_sku})
+                records.append(
+                    {
+                        "sku": sku,
+                        "T": T,
+                        "method": m,
+                        "rop": rop,
+                        "ss": rop - base * lt_wks,
+                        "base_lt": base * lt_wks,
+                        "scale": sig[m] * math.sqrt(lt_wks),
+                        "lead": lead,
+                        "realised": realised,
+                        "sparse": sparse,
+                        "category": category,
+                        "z": z_sku,
+                    }
+                )
             fc_err["scanota"][0] += abs(values[T] - fc["forecast"][0])
             fc_err["baseline"][0] += abs(values[T] - ma4)
             fc_err["scanota"][1] += values[T]
@@ -263,8 +297,11 @@ def run_backtest(
 
     by_method: dict[str, dict[str, dict[str, float]]] = defaultdict(dict)
     for m in methods:
-        for label, pick in (("all", lambda r: True), ("sparse", lambda r: r["sparse"]),
-                            ("regular", lambda r: not r["sparse"])):
+        for label, pick in (
+            ("all", lambda r: True),
+            ("sparse", lambda r: r["sparse"]),
+            ("regular", lambda r: not r["sparse"]),
+        ):
             rows = [r for r in records if r["method"] == m and pick(r)]
             stats = stockout_stats([r["rop"] for r in rows], [r["realised"] for r in rows])
             stats["avg_safety_stock"] = float(np.mean([r["ss"] for r in rows])) if rows else 0.0
@@ -275,15 +312,21 @@ def run_backtest(
     by_lead: dict[str, dict[str, dict[str, float]]] = defaultdict(dict)
     for m in methods:
         rows = [r for r in records if r["method"] == m]
-        z_needed[m] = z_for_target([r["base_lt"] for r in rows], [r["scale"] for r in rows],
-                                   [r["realised"] for r in rows])
+        z_needed[m] = z_for_target(
+            [r["base_lt"] for r in rows], [r["scale"] for r in rows], [r["realised"] for r in rows]
+        )
         per_sku: dict[str, list[float]] = defaultdict(list)
         for r in rows:
             per_sku[r["sku"]].append(r["scale"])
         stability[m] = sigma_stability(per_sku)
-        for label, pick in (("lead<=3d", lambda r: r["lead"] <= 3), ("lead>3d", lambda r: r["lead"] > 3)):
+        for label, pick in (
+            ("lead<=3d", lambda r: r["lead"] <= 3),
+            ("lead>3d", lambda r: r["lead"] > 3),
+        ):
             sel = [r for r in rows if pick(r)]
-            by_lead[m][label] = stockout_stats([r["rop"] for r in sel], [r["realised"] for r in sel])
+            by_lead[m][label] = stockout_stats(
+                [r["rop"] for r in sel], [r["realised"] for r in sel]
+            )
 
     # Per category, for the estimator production uses: stockout at the z in force, and the z that
     # would have hit 5 % and 10 %. Categories hold only a few SKUs, so read the counts with care.
@@ -291,7 +334,11 @@ def run_backtest(
     by_category: dict[str, dict[str, float]] = {}
     for cat in sorted({r["category"] for r in records}):
         rows = [r for r in records if r["method"] == prod and r["category"] == cat]
-        cols = ([r["base_lt"] for r in rows], [r["scale"] for r in rows], [r["realised"] for r in rows])
+        cols = (
+            [r["base_lt"] for r in rows],
+            [r["scale"] for r in rows],
+            [r["realised"] for r in rows],
+        )
         stats = stockout_stats([r["rop"] for r in rows], cols[2])
         stats.update(
             z=rows[0]["z"],
@@ -344,49 +391,77 @@ def format_report(result: dict[str, Any]) -> str:
         f"{result['max_sigma_mismatch']:.2e}",
     ]
     for label in ("all", "regular", "sparse"):
-        lines += ["", f"[{label} SKUs]", f"{'method':<14}{'stockout':>10}{'unmet demand':>14}"
-                  f"{'avg safety':>12}{'avg rop':>10}{'n':>7}"]
+        lines += [
+            "",
+            f"[{label} SKUs]",
+            f"{'method':<14}{'stockout':>10}{'unmet demand':>14}"
+            f"{'avg safety':>12}{'avg rop':>10}{'n':>7}",
+        ]
         for m, per in result["methods"].items():
             s = per[label]
-            lines.append(f"{m:<14}{s['stockout_rate']:>10.1%}{s['unmet_pct']:>14.1%}"
-                         f"{s['avg_safety_stock']:>12.2f}{s['avg_rop']:>10.2f}{s['n']:>7}")
+            lines.append(
+                f"{m:<14}{s['stockout_rate']:>10.1%}{s['unmet_pct']:>14.1%}"
+                f"{s['avg_safety_stock']:>12.2f}{s['avg_rop']:>10.2f}{s['n']:>7}"
+            )
     lines += ["", "Calibration and stability", f"{'method':<14}{'z for 5%':>10}{'sigma CV':>10}"]
     for m in result["methods"]:
         z = result["z_needed_for_5pct"][m]
         lines.append(f"{m:<14}{z:>10.2f}{result['sigma_stability_cv'][m]:>10.2f}")
     labels = ("lead<=3d", "lead>3d")
-    lines += ["", "Stockout rate by lead time",
-              f"{'method':<14}" + "".join(f"{lab:>12}" for lab in labels) + f"{'n (<=3d / >3d)':>20}"]
+    lines += [
+        "",
+        "Stockout rate by lead time",
+        f"{'method':<14}" + "".join(f"{lab:>12}" for lab in labels) + f"{'n (<=3d / >3d)':>20}",
+    ]
     for m, per in result["by_lead_time"].items():
         counts = f"{per[labels[0]]['n']} / {per[labels[1]]['n']}"
-        lines.append(f"{m:<14}" + "".join(f"{per[lab]['stockout_rate']:>12.1%}" for lab in labels)
-                     + f"{counts:>20}")
+        lines.append(
+            f"{m:<14}"
+            + "".join(f"{per[lab]['stockout_rate']:>12.1%}" for lab in labels)
+            + f"{counts:>20}"
+        )
     cats = result.get("by_category") or {}
     if cats:
-        lines += ["", f"By category ({result['category_method']}, z as configured)",
-                  f"{'category':<17}{'SKUs':>5}{'cases':>7}{'z':>6}{'stockout':>10}{'unmet':>8}"
-                  f"{'avg safety':>12}{'z for 5%':>10}{'z for 10%':>11}"]
+        lines += [
+            "",
+            f"By category ({result['category_method']}, z as configured)",
+            f"{'category':<17}{'SKUs':>5}{'cases':>7}{'z':>6}{'stockout':>10}{'unmet':>8}"
+            f"{'avg safety':>12}{'z for 5%':>10}{'z for 10%':>11}",
+        ]
         for cat, s in cats.items():
-            lines.append(f"{cat:<17}{s['skus']:>5}{s['n']:>7}{s['z']:>6.2f}{s['stockout_rate']:>10.1%}"
-                         f"{s['unmet_pct']:>8.1%}{s['avg_safety_stock']:>12.2f}"
-                         f"{s['z_for_5pct']:>10.2f}{s['z_for_10pct']:>11.2f}")
+            lines.append(
+                f"{cat:<17}{s['skus']:>5}{s['n']:>7}{s['z']:>6.2f}{s['stockout_rate']:>10.1%}"
+                f"{s['unmet_pct']:>8.1%}{s['avg_safety_stock']:>12.2f}"
+                f"{s['z_for_5pct']:>10.2f}{s['z_for_10pct']:>11.2f}"
+            )
     sug = result.get("suggested_z") or {}
     if sug:
-        lines += ["", "Suggested z per category (own estimate pulled toward the pooled z: "
-                      f"{result['pooled_z']['5pct']:.2f} for 5%, {result['pooled_z']['10pct']:.2f} for 10%)"]
+        lines += [
+            "",
+            "Suggested z per category (own estimate pulled toward the pooled z: "
+            f"{result['pooled_z']['5pct']:.2f} for 5%, {result['pooled_z']['10pct']:.2f} for 10%)",
+        ]
         lines.append("  " + ", ".join(f"{c}: {z}" for c, z in sug.items()))
     tiers = result.get("tier_z") or {}
     if tiers:
-        lines += ["", f"z per tier on the full period: durable (5% target) {tiers['durable']:.2f}, "
-                      f"shelf life (10% target) {tiers['shelf_life']:.2f}"]
+        lines += [
+            "",
+            f"z per tier on the full period: durable (5% target) {tiers['durable']:.2f}, "
+            f"shelf life (10% target) {tiers['shelf_life']:.2f}",
+        ]
     ho = result.get("holdout")
     if ho:
-        lines += ["", f"Out-of-sample check: z calibrated on {ho['calibrated_on_cases']} earlier cases, "
-                      f"scored on {ho['scored_on_cases']} later ones",
-                  f"{'policy':<28}{'overall':>9}{'durable':>9}{'shelf life':>12}{'avg safety':>12}"]
+        lines += [
+            "",
+            f"Out-of-sample check: z calibrated on {ho['calibrated_on_cases']} earlier cases, "
+            f"scored on {ho['scored_on_cases']} later ones",
+            f"{'policy':<28}{'overall':>9}{'durable':>9}{'shelf life':>12}{'avg safety':>12}",
+        ]
         for name, p in ho["policies"].items():
-            lines.append(f"{name:<28}{p['overall']:>9.1%}{p['durable']:>9.1%}"
-                         f"{p['shelf_life']:>12.1%}{p['avg_safety_stock']:>12.2f}")
+            lines.append(
+                f"{name:<28}{p['overall']:>9.1%}{p['durable']:>9.1%}"
+                f"{p['shelf_life']:>12.1%}{p['avg_safety_stock']:>12.2f}"
+            )
         lines.append("  targets: durable 5%, shelf-life 10%")
     return "\n".join(lines)
 
@@ -414,8 +489,13 @@ def main() -> None:
 
     default_z = get_settings().safety_stock_z
     result = run_backtest(
-        sales, lead_days, origins=args.origins, z=default_z,
-        categories=categories, z_by_category=z_by_category(default_z), target_of=target_stockout,
+        sales,
+        lead_days,
+        origins=args.origins,
+        z=default_z,
+        categories=categories,
+        z_by_category=z_by_category(default_z),
+        target_of=target_stockout,
     )
     print(format_report(result))
     if args.json:

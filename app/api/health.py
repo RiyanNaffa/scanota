@@ -1,4 +1,5 @@
 """app/api/health.py – Liveness and DB check endpoint."""
+
 from __future__ import annotations
 
 from fastapi import APIRouter

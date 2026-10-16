@@ -1,4 +1,5 @@
 """tests/unit/test_sql_guard.py – At least 30 SQL guard test cases."""
+
 from __future__ import annotations
 
 import pytest
@@ -67,7 +68,9 @@ class TestDMLRejected:
 
     def test_insert(self):
         with pytest.raises(UnsafeSQL):
-            validate_sql("INSERT INTO sales_flat VALUES (1, '2025-01-01', 'online', NULL, NULL, NULL, NULL, 1, 'pcs', 1000, 1000)")
+            validate_sql(
+                "INSERT INTO sales_flat VALUES (1, '2025-01-01', 'online', NULL, NULL, NULL, NULL, 1, 'pcs', 1000, 1000)"
+            )
 
     def test_truncate_via_command(self):
         with pytest.raises(UnsafeSQL):
@@ -89,7 +92,9 @@ class TestForbiddenTables:
 
     def test_subquery_forbidden_table(self):
         with pytest.raises(UnsafeSQL):
-            validate_sql("SELECT * FROM sales_flat WHERE transaction_id IN (SELECT id FROM transactions)")
+            validate_sql(
+                "SELECT * FROM sales_flat WHERE transaction_id IN (SELECT id FROM transactions)"
+            )
 
 
 class TestDangerousFunctions:

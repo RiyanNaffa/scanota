@@ -1,4 +1,5 @@
 """app/forecast/service.py – Forecast service: build series and compute restock."""
+
 from __future__ import annotations
 
 import logging
@@ -26,7 +27,11 @@ logger = logging.getLogger(__name__)
 
 # fallback_reason from forecast_sku -> data_quality shown to the client. Anything not listed
 # (statsforecast missing, model error) means the forecast model did not run at all.
-_DATA_QUALITY = {None: "ok", "short_history": "insufficient_history", "no_data": "insufficient_history"}
+_DATA_QUALITY = {
+    None: "ok",
+    "short_history": "insufficient_history",
+    "no_data": "insufficient_history",
+}
 
 
 def data_quality_label(fc_result: dict[str, Any]) -> str:
@@ -39,8 +44,10 @@ def shelf_life_note(risk: str | None, days_out: float, shelf_days: int | None) -
         return None
     cover = "tidak terjual" if days_out == float("inf") else f"cukup sekitar {days_out:.0f} hari"
     if risk == "high":
-        return (f"Stok {cover}, melebihi masa simpan {shelf_days} hari: berisiko kedaluwarsa. "
-                f"Tahan pembelian dan jual stok lama dulu.")
+        return (
+            f"Stok {cover}, melebihi masa simpan {shelf_days} hari: berisiko kedaluwarsa. "
+            f"Tahan pembelian dan jual stok lama dulu."
+        )
     return f"Stok {cover}, mendekati masa simpan {shelf_days} hari. Pantau."
 
 
@@ -101,8 +108,10 @@ def build_restock_list(db: Session) -> list[dict[str, Any]]:
         wanted_qty = order_qty
         order_qty = cap_order_for_shelf_life(order_qty, current_stock, weekly_fc, shelf_days)
         # Without any sales history the cover is unknown, so no shelf-life verdict.
-        risk = None if fc_result.get("fallback_reason") == "no_data" else shelf_life_risk(
-            current_stock, weekly_fc, shelf_days
+        risk = (
+            None
+            if fc_result.get("fallback_reason") == "no_data"
+            else shelf_life_risk(current_stock, weekly_fc, shelf_days)
         )
         days_out = days_until_stockout(current_stock, weekly_fc)
         act = action(current_stock, rop)
@@ -110,28 +119,30 @@ def build_restock_list(db: Session) -> list[dict[str, Any]]:
 
         data_quality = data_quality_label(fc_result)
 
-        results.append({
-            "sku_id": sku_id,
-            "name": name,
-            "category": category,
-            "unit": unit,
-            "current_stock": current_stock,
-            "forecast_next_2_weeks": fc_result["forecast"],
-            "model_used": fc_result["model_used"],
-            "days_until_stockout": days_out if days_out != float("inf") else None,
-            "reorder_point": round(rop, 2),
-            "suggested_order_qty": order_qty,
-            "action": act,
-            "reason": reason,
-            "data_quality": data_quality,
-            "z": z,
-            "shelf_life_days": shelf_days,
-            "shelf_life_risk": risk,
-            "shelf_life_note": shelf_life_note(risk, days_out, shelf_days),
-            "order_capped_by_shelf_life": order_qty < wanted_qty,
-            "wape_primary": fc_result["wape_primary"],
-            "wape_baseline": fc_result["wape_baseline"],
-        })
+        results.append(
+            {
+                "sku_id": sku_id,
+                "name": name,
+                "category": category,
+                "unit": unit,
+                "current_stock": current_stock,
+                "forecast_next_2_weeks": fc_result["forecast"],
+                "model_used": fc_result["model_used"],
+                "days_until_stockout": days_out if days_out != float("inf") else None,
+                "reorder_point": round(rop, 2),
+                "suggested_order_qty": order_qty,
+                "action": act,
+                "reason": reason,
+                "data_quality": data_quality,
+                "z": z,
+                "shelf_life_days": shelf_days,
+                "shelf_life_risk": risk,
+                "shelf_life_note": shelf_life_note(risk, days_out, shelf_days),
+                "order_capped_by_shelf_life": order_qty < wanted_qty,
+                "wape_primary": fc_result["wape_primary"],
+                "wape_baseline": fc_result["wape_baseline"],
+            }
+        )
 
     # Sort by urgency: order_now first, then watch, then ok
     urgency = {"order_now": 0, "watch": 1, "ok": 2}
@@ -151,19 +162,20 @@ def get_forecast_series(db: Session, sku_id: str) -> dict[str, Any] | None:
     sigma = fc_result["sigma"]
 
     history = [
-        {"week": str(p), "qty": float(v)}
-        for p, v in zip(series.index, series.values, strict=False)
+        {"week": str(p), "qty": float(v)} for p, v in zip(series.index, series.values, strict=False)
     ]
     fc_weeks = []
     last_period = series.index[-1]
     for i, v in enumerate(fc_result["forecast"]):
         next_p = last_period + (i + 1)
-        fc_weeks.append({
-            "week": str(next_p),
-            "qty": v,
-            "lower": max(0.0, v - 1.65 * sigma),
-            "upper": v + 1.65 * sigma,
-        })
+        fc_weeks.append(
+            {
+                "week": str(next_p),
+                "qty": v,
+                "lower": max(0.0, v - 1.65 * sigma),
+                "upper": v + 1.65 * sigma,
+            }
+        )
 
     return {
         "sku_id": sku_id,

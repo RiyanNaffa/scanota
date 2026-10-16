@@ -19,6 +19,7 @@ Rules for string parsing:
     is 00 (i.e. whole Rupiah).
   * Reject empty, negative, and non-numeric input.
 """
+
 from __future__ import annotations
 
 import re

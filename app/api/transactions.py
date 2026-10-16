@@ -1,4 +1,5 @@
 """app/api/transactions.py – Transaction list and detail endpoints."""
+
 from __future__ import annotations
 
 from typing import Annotated, Any

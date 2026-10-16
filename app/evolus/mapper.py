@@ -9,6 +9,7 @@ To adjust:
     2. Update FIELD_MAP keys to match actual field paths in the response.
     3. Test with app.evolus.mapper.map_evolus_response(sample_response).
 """
+
 from __future__ import annotations
 
 from typing import Any
@@ -18,15 +19,15 @@ from app.extraction.schema import ExtractedItem, ExtractionResult
 # Field mapping: ExtractionResult field -> path in Evolus response
 # Set to None for fields not present in the Evolus response.
 FIELD_MAP = {
-    "date": "date",           # TO_CONFIRM: adjust to actual path
-    "customer": "customer",   # TO_CONFIRM
-    "total": "total",         # TO_CONFIRM
-    "notes": "notes",         # TO_CONFIRM
+    "date": "date",  # TO_CONFIRM: adjust to actual path
+    "customer": "customer",  # TO_CONFIRM
+    "total": "total",  # TO_CONFIRM
+    "notes": "notes",  # TO_CONFIRM
     # Items list path in response
-    "items_key": "items",     # TO_CONFIRM: key that holds the items array
+    "items_key": "items",  # TO_CONFIRM: key that holds the items array
     "item_name_raw": "item_name_raw",  # TO_CONFIRM
-    "qty": "qty",             # TO_CONFIRM
-    "unit": "unit",           # TO_CONFIRM
+    "qty": "qty",  # TO_CONFIRM
+    "unit": "unit",  # TO_CONFIRM
     "unit_price": "unit_price",  # TO_CONFIRM
     "line_total": "line_total",  # TO_CONFIRM
 }
