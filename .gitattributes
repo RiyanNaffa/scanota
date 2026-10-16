@@ -1,0 +1,4 @@
+# Shell scripts run inside Linux containers. With Windows CRLF line endings the shebang line
+# becomes "bash" followed by a carriage return, the script never runs, and the container
+# silently skips it (this is how the scanota_ro role went missing).
+*.sh text eol=lf

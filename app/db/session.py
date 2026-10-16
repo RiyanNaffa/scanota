@@ -7,6 +7,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.config import get_settings
+from app.db.url import to_sqlalchemy_url
 
 
 def _make_engine(url: str, readonly: bool = False):
@@ -16,7 +17,7 @@ def _make_engine(url: str, readonly: bool = False):
         "pool_size": 5,
         "max_overflow": 10,
     }
-    return create_engine(url, connect_args=connect_args, **kwargs)
+    return create_engine(to_sqlalchemy_url(url), connect_args=connect_args, **kwargs)
 
 
 _settings = get_settings()
