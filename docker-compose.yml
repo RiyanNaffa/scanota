@@ -49,6 +49,8 @@ services:
       STORAGE_DIR:           /srv/storage
     volumes:
       - storage:/srv/storage
+      # Sample data for `make demo-data` (python -m app.db.seed reads data/ relative to /srv/app)
+      - ./data:/srv/app/data:ro
     ports:
       - "8000:8000"
     depends_on:
