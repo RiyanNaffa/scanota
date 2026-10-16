@@ -1,0 +1,39 @@
+# app/requirements.txt – pinned production dependencies
+# Verified against Python 3.11 in app/Dockerfile
+
+# Web framework
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+starlette==0.41.3
+
+# Database
+sqlalchemy==2.0.36
+psycopg[binary]==3.2.3
+
+# Settings / validation
+pydantic==2.10.5
+pydantic-settings==2.7.0
+
+# LLM client
+openai==1.58.1
+
+# HTTP client (Evolus)
+httpx==0.27.2
+
+# Image processing
+opencv-python-headless==4.11.0.86
+pillow==10.4.0
+
+# Fuzzy matching
+rapidfuzz==3.11.0
+
+# Forecast
+statsforecast==1.7.8
+numpy==1.26.4
+pandas==2.2.2
+
+# SQL guard
+sqlglot==25.34.1
+
+# Misc
+python-multipart==0.0.20

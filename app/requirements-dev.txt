@@ -1,0 +1,10 @@
+# app/requirements-dev.txt – development and test extras
+-r requirements.txt
+
+# Testing
+pytest==8.3.4
+pytest-asyncio==0.25.2
+httpx==0.27.2
+
+# Code quality
+ruff==0.9.2
