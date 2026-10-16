@@ -1,0 +1,39 @@
+sku_id,name,category,unit,cost_price,current_stock,lead_time_days
+SMN001,Semen Tiga Roda 50kg,Semen,sak,68000,80,3
+SMN002,Semen Gresik 50kg,Semen,sak,70000,50,3
+SMN003,Semen Holcim 40kg,Semen,sak,60000,30,3
+CAT001,Cat Tembok Putih 5kg,Cat,kg,45000,40,2
+CAT002,Cat Besi Merah 1kg,Cat,kg,55000,20,2
+CAT003,Cat Kayu Coklat 1kg,Cat,kg,48000,15,2
+PKU001,Paku Biasa 2 inch,Paku & Sekrup,kg,18000,25,1
+PKU002,Paku Biasa 3 inch,Paku & Sekrup,kg,17000,20,1
+SKR001,Sekrup Kayu 3cm,Paku & Sekrup,lusin,8000,30,1
+SKR002,Sekrup Dinding Fischer,Paku & Sekrup,pcs,2500,50,1
+PVC001,Pipa PVC 3/4 inch,Pipa & Fitting,btg,35000,45,3
+PVC002,Pipa PVC 1 inch,Pipa & Fitting,btg,42000,30,3
+FTG001,Elbow PVC 3/4 inch,Pipa & Fitting,pcs,5000,60,2
+FTG002,Tee PVC 3/4 inch,Pipa & Fitting,pcs,5500,50,2
+KBL001,Kabel NYM 2x1.5mm,Kabel & Listrik,m,12000,100,2
+KBL002,Kabel NYM 3x2.5mm,Kabel & Listrik,m,18000,70,2
+SWC001,Saklar Tunggal,Kabel & Listrik,pcs,15000,30,1
+STP001,Stop Kontak Tanam,Kabel & Listrik,pcs,22000,40,1
+KRM001,Keramik 40x40 Putih,Keramik,m2,85000,35,5
+KRM002,Keramik 30x30 Abu-abu,Keramik,m2,70000,25,5
+KRM003,Granit 60x60 Putih,Keramik,m2,150000,15,5
+ALT001,Kuas Cat 3 inch,Alat,pcs,12000,20,1
+ALT002,Rol Cat 9 inch,Alat,pcs,25000,15,1
+ALT003,Meteran 5m,Alat,pcs,35000,12,1
+ALT004,Gergaji Kayu,Alat,pcs,65000,8,2
+KYU001,Kayu Balok 5x10x400,Kayu,btg,45000,40,4
+KYU002,Triplek 9mm 4x8,Kayu,lbr,120000,25,4
+KYU003,Kayu Reng 3x5x400,Kayu,btg,18000,55,4
+PSR001,Pasir Beton 1 Kubik,Pasir & Batu,m3,350000,20,2
+PSR002,Pasir Pasang 1 Kubik,Pasir & Batu,m3,280000,15,2
+BTU001,Batu Split 1-2 1 Kubik,Pasir & Batu,m3,300000,12,2
+BTU002,Bata Merah 1000pcs,Pasir & Batu,lot,850000,10,3
+SKM001,Sika Plafon 5kg,Semen & Plester,kg,38000,25,2
+SKM002,Mortar Lantai 40kg,Semen & Plester,sak,75000,22,3
+WRC001,Waterproofing 4kg,Waterproofing,kg,95000,15,2
+GRC001,GRC Board 60x120,Panel,lbr,65000,20,3
+ISO001,Isotank 500L,Tangki Air,pcs,750000,4,7
+KNS001,Konektor Sambungan Pipa,Pipa & Fitting,pcs,8500,40,1

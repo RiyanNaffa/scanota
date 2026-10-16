@@ -1,0 +1,511 @@
+external_ref,date,customer,item_name,qty,unit,unit_price
+ORD-2025-000004,2025-04-13,CV Berkah Bersama,bata merah,2,lot,845166
+ORD-2025-000003,2025-04-14,Budi Santoso,triplek 9mm,4,lbr,119418
+ORD-2025-000005,2025-04-16,CV Maju Konstruksi,MRT LNT,2,sak,72485
+ORD-2025-000001,2025-04-18,Budi Santoso,cat kayu coklat,4,kg,47336
+ORD-2025-000002,2025-04-18,CV Maju Konstruksi,keramik 30x30,6,m2,72525
+ORD-2025-000006,2025-04-18,Hendra Wijaya,waterproof 4kg,3,kg,92960
+ORD-2025-000009,2025-04-20,Pak Herman,tee pvc 3/4,8,pcs,5322
+ORD-2025-000015,2025-04-20,Hendra Wijaya,tank air 500,1,pcs,756306
+ORD-2025-000013,2025-04-21,CV Maju Konstruksi,Kayu Balok 5x10x400,6,btg,43413
+ORD-2025-000011,2025-04-23,Toko Bangunan Jaya,kuas 3in,2,pcs,12139
+ORD-2025-000012,2025-04-23,Toko Bangunan Jaya,Rol Cat 9 inch,2,pcs,25267
+ORD-2025-000007,2025-04-24,CV Maju Konstruksi,SMN GRK,6,sak,73473
+ORD-2025-000014,2025-04-24,Hendra Wijaya,plywood 9mm,5,lbr,119465
+ORD-2025-000008,2025-04-25,CV Berkah Bersama,elbow pvc,7,pcs,4953
+ORD-2025-000010,2025-04-26,Toko Bangunan Jaya,kabel 3x2.5,11,m,17929
+ORD-2025-000019,2025-04-27,Toko Bangunan Jaya,skrup fischer,14,pcs,2416
+ORD-2025-000023,2025-04-27,Budi Santoso,pasir beton 1 m3,6,m3,335481
+ORD-2025-000025,2025-04-27,CV Maju Konstruksi,grc 60x120,2,lbr,67123
+ORD-2025-000016,2025-04-30,Toko Bangunan Jaya,SMN HLC,8,sak,58090
+ORD-2025-000021,2025-04-30,Pak Herman,kbl nym 2.5,18,m,18494
+ORD-2025-000018,2025-05-01,CV Maju Konstruksi,"paku biasa 2""",3,kg,17459
+ORD-2025-000022,2025-05-01,Pak Herman,stopkontak,8,pcs,21436
+ORD-2025-000017,2025-05-03,Toko Bangunan Jaya,cat besi merah,4,kg,56826
+ORD-2025-000020,2025-05-03,CV Berkah Bersama,elbow 3/4,10,pcs,5148
+ORD-2025-000024,2025-05-03,Hendra Wijaya,WC 4kg,4,kg,96188
+ORD-2025-000030,2025-05-04,Pak Herman,batu bata,2,lot,833186
+ORD-2025-000031,2025-05-04,Toko Bangunan Jaya,GRC BRD,4,lbr,65752
+ORD-2025-000029,2025-05-05,CV Maju Konstruksi,plywood 9mm,4,lbr,119620
+ORD-2025-000032,2025-05-06,Hendra Wijaya,konektor pipa,8,pcs,8387
+ORD-2025-000026,2025-05-10,CV Maju Konstruksi,gresik 50kg,3,sak,70526
+ORD-2025-000027,2025-05-10,Pak Herman,KRM 30,6,m2,71332
+ORD-2025-000028,2025-05-10,Toko Bangunan Jaya,Kayu Balok 5x10x400,9,btg,46487
+ORD-2025-000037,2025-05-11,CV Maju Konstruksi,keramik putih,7,m2,85575
+ORD-2025-000036,2025-05-13,Budi Santoso,SWC TGL,8,pcs,14651
+ORD-2025-000038,2025-05-14,CV Maju Konstruksi,pasir pasang,3,m3,291754
+ORD-2025-000034,2025-05-15,Pak Herman,skrup fischer,7,pcs,2508
+ORD-2025-000035,2025-05-16,Hendra Wijaya,pipa pvc 3 4,8,btg,33650
+ORD-2025-000033,2025-05-17,Budi Santoso,holcim,4,sak,58398
+ORD-2025-000039,2025-05-17,Hendra Wijaya,plafon sika,4,kg,37434
+ORD-2025-000040,2025-05-17,Budi Santoso,Isotank 500L,1,pcs,761663
+ORD-2025-000041,2025-05-21,CV Maju Konstruksi,holcim,4,sak,61434
+ORD-2025-000042,2025-05-23,Pak Herman,PKU 3IN,3,kg,16676
+ORD-2025-000044,2025-05-23,CV Maju Konstruksi,switch tunggal,5,pcs,15082
+ORD-2025-000043,2025-05-24,Pak Herman,KBL NYM,19,m,12581
+ORD-2025-000046,2025-05-25,Hendra Wijaya,Keramik 30x30 Abu-abu,7,m2,69416
+ORD-2025-000047,2025-05-25,Pak Herman,bata 1000,1,lot,838605
+ORD-2025-000045,2025-05-27,CV Maju Konstruksi,saklar 1,6,pcs,15592
+ORD-2025-000049,2025-06-02,CV Berkah Bersama,kuas cat 3,4,pcs,11643
+ORD-2025-000053,2025-06-02,Budi Santoso,batu split 1-2,3,m3,311671
+ORD-2025-000048,2025-06-03,Pak Herman,kabel listrik 1.5,16,m,12421
+ORD-2025-000050,2025-06-06,Hendra Wijaya,Kayu Balok 5x10x400,5,btg,46196
+ORD-2025-000051,2025-06-06,CV Maju Konstruksi,triplek 9,7,lbr,118530
+ORD-2025-000052,2025-06-07,CV Maju Konstruksi,Pasir Pasang 1 Kubik,4,m3,287434
+ORD-2025-000056,2025-06-08,Hendra Wijaya,pipa pvc 3/4,11,btg,33510
+ORD-2025-000055,2025-06-09,Toko Bangunan Jaya,PKU 2IN,4,kg,17945
+ORD-2025-000057,2025-06-09,Hendra Wijaya,pipa pvc 1 inch,5,btg,40872
+ORD-2025-000061,2025-06-10,Budi Santoso,reng 3 5,8,btg,17911
+ORD-2025-000058,2025-06-11,Hendra Wijaya,tee 3/4,14,pcs,5727
+ORD-2025-000059,2025-06-11,Pak Herman,stopkontak,7,pcs,21074
+ORD-2025-000054,2025-06-12,CV Maju Konstruksi,semen holcim,4,sak,62083
+ORD-2025-000060,2025-06-12,CV Berkah Bersama,Triplek 9mm 4x8,2,lbr,118087
+ORD-2025-000062,2025-06-15,Pak Herman,sekrup kayu 3,4,lusin,8373
+ORD-2025-000066,2025-06-17,Hendra Wijaya,mortar 40kg,4,sak,73123
+ORD-2025-000063,2025-06-21,Budi Santoso,Gergaji Kayu,1,pcs,64900
+ORD-2025-000064,2025-06-21,CV Maju Konstruksi,Pasir Beton 1 Kubik,3,m3,351472
+ORD-2025-000065,2025-06-21,Toko Bangunan Jaya,pasir pasang,3,m3,287038
+ORD-2025-000069,2025-06-22,Hendra Wijaya,fisher screw,8,pcs,2437
+ORD-2025-000070,2025-06-22,CV Maju Konstruksi,ELB 3/4,15,pcs,4758
+ORD-2025-000071,2025-06-22,Toko Bangunan Jaya,bata merah,2,lot,819602
+ORD-2025-000067,2025-06-24,Toko Bangunan Jaya,holcim 40,5,sak,57560
+ORD-2025-000072,2025-06-24,Pak Herman,isotank 500l,1,pcs,746394
+ORD-2025-000068,2025-06-27,Pak Herman,CAT TMB,12,kg,43495
+ORD-2025-000074,2025-07-02,CV Maju Konstruksi,Paku Biasa 3 inch,6,kg,16821
+ORD-2025-000076,2025-07-03,CV Berkah Bersama,KBL NYM25,12,m,17719
+ORD-2025-000077,2025-07-03,Budi Santoso,Keramik 30x30 Abu-abu,6,m2,71659
+ORD-2025-000073,2025-07-04,CV Maju Konstruksi,gresik 50kg,15,sak,69274
+ORD-2025-000075,2025-07-05,Pak Herman,KBL NYM,12,m,12354
+ORD-2025-000078,2025-07-05,Budi Santoso,MTR 5M,2,pcs,34443
+ORD-2025-000080,2025-07-07,CV Berkah Bersama,paku 3in,5,kg,16854
+ORD-2025-000083,2025-07-07,Pak Herman,kayu reng,4,btg,18328
+ORD-2025-000084,2025-07-08,Hendra Wijaya,waterproof 4kg,3,kg,98862
+ORD-2025-000079,2025-07-10,CV Maju Konstruksi,SMN 3R,11,sak,65694
+ORD-2025-000081,2025-07-11,CV Maju Konstruksi,Saklar Tunggal,4,pcs,15286
+ORD-2025-000082,2025-07-12,Toko Bangunan Jaya,Stop Kontak Tanam,8,pcs,21567
+ORD-2025-000088,2025-07-13,CV Berkah Bersama,KRM 40,5,m2,85098
+ORD-2025-000087,2025-07-14,CV Berkah Bersama,paku 3 inch,3,kg,17666
+ORD-2025-000089,2025-07-14,Toko Bangunan Jaya,pasir pasang,2,m3,268603
+ORD-2025-000085,2025-07-16,Toko Bangunan Jaya,semen gresik,11,sak,69172
+ORD-2025-000086,2025-07-17,CV Maju Konstruksi,"paku biasa 2""",3,kg,17790
+ORD-2025-000090,2025-07-18,Pak Herman,Batu Split 1-2 1 Kubik,2,m3,293155
+ORD-2025-000095,2025-07-20,CV Berkah Bersama,rol cat 9 inch,1,pcs,24532
+ORD-2025-000096,2025-07-24,Toko Bangunan Jaya,BTU MRH,3,lot,817137
+ORD-2025-000091,2025-07-25,CV Berkah Bersama,"pipa pvc 1""",5,btg,40480
+ORD-2025-000092,2025-07-25,CV Berkah Bersama,tee pvc 3/4,12,pcs,5617
+ORD-2025-000094,2025-07-25,Hendra Wijaya,kuas 3 inch,5,pcs,12235
+ORD-2025-000097,2025-07-25,Pak Herman,grc board,4,lbr,66569
+ORD-2025-000093,2025-07-26,Pak Herman,saklar tunggal,8,pcs,15051
+ORD-2025-000100,2025-07-27,Hendra Wijaya,elbow 3 4,9,pcs,5175
+ORD-2025-000105,2025-07-27,Toko Bangunan Jaya,kayu balok,9,btg,46026
+ORD-2025-000107,2025-07-27,CV Maju Konstruksi,Pasir Pasang 1 Kubik,2,m3,280880
+ORD-2025-000099,2025-07-28,CV Berkah Bersama,PVC 1IN,5,btg,40488
+ORD-2025-000106,2025-07-30,Budi Santoso,pasir beton 1 m3,6,m3,353693
+ORD-2025-000110,2025-07-30,Budi Santoso,konektor,5,pcs,8413
+ORD-2025-000101,2025-07-31,CV Maju Konstruksi,TEE PVC,7,pcs,5342
+ORD-2025-000103,2025-07-31,Pak Herman,kuas 3 inch,3,pcs,11984
+ORD-2025-000104,2025-07-31,Pak Herman,gergaji,1,pcs,65108
+ORD-2025-000108,2025-07-31,Hendra Wijaya,bata merah,2,lot,884668
+ORD-2025-000109,2025-07-31,CV Berkah Bersama,Sika Plafon 5kg,5,kg,36419
+ORD-2025-000098,2025-08-01,Pak Herman,paku 2in,5,kg,18890
+ORD-2025-000102,2025-08-02,Budi Santoso,kbl nym 1.5,27,m,11839
+ORD-2025-000112,2025-08-04,CV Berkah Bersama,Pipa PVC 3/4 inch,11,btg,34218
+ORD-2025-000116,2025-08-04,Hendra Wijaya,Kayu Reng 3x5x400,11,btg,17453
+ORD-2025-000113,2025-08-06,Hendra Wijaya,Elbow PVC 3/4 inch,19,pcs,5037
+ORD-2025-000111,2025-08-07,Hendra Wijaya,CAT KYU,2,kg,47523
+ORD-2025-000117,2025-08-07,Hendra Wijaya,Mortar Lantai 40kg,4,sak,73913
+ORD-2025-000114,2025-08-08,Pak Herman,Tee PVC 3/4 inch,8,pcs,5642
+ORD-2025-000115,2025-08-08,CV Maju Konstruksi,Keramik 40x40 Putih,8,m2,81769
+ORD-2025-000119,2025-08-11,Hendra Wijaya,Rol Cat 9 inch,2,pcs,24055
+ORD-2025-000120,2025-08-11,CV Berkah Bersama,PSR PSG,3,m3,279308
+ORD-2025-000118,2025-08-14,Toko Bangunan Jaya,SMN GRK,9,sak,67083
+ORD-2025-000121,2025-08-16,Toko Bangunan Jaya,Bata Merah 1000pcs,2,lot,874528
+ORD-2025-000123,2025-08-17,CV Maju Konstruksi,"paku biasa 2""",3,kg,18829
+ORD-2025-000127,2025-08-17,Toko Bangunan Jaya,grnt 60x60,2,m2,151428
+ORD-2025-000122,2025-08-19,CV Berkah Bersama,cat tmbok putih,11,kg,43012
+ORD-2025-000126,2025-08-19,Hendra Wijaya,Keramik 40x40 Putih,7,m2,86991
+ORD-2025-000128,2025-08-19,Toko Bangunan Jaya,Kuas Cat 3 inch,2,pcs,12506
+ORD-2025-000124,2025-08-20,Hendra Wijaya,PVC 1IN,1,btg,41632
+ORD-2025-000129,2025-08-21,CV Berkah Bersama,gergaji,1,pcs,68062
+ORD-2025-000125,2025-08-23,Toko Bangunan Jaya,SWC TGL,7,pcs,14625
+ORD-2025-000130,2025-08-25,Budi Santoso,CAT KYU,6,kg,50156
+ORD-2025-000132,2025-08-26,Hendra Wijaya,pipa 3/4,7,btg,36379
+ORD-2025-000137,2025-08-26,CV Maju Konstruksi,Batu Split 1-2 1 Kubik,4,m3,310299
+ORD-2025-000135,2025-08-27,Hendra Wijaya,keramik 30x30,1,m2,69745
+ORD-2025-000136,2025-08-27,Budi Santoso,Granit 60x60 Putih,4,m2,152942
+ORD-2025-000131,2025-08-28,Hendra Wijaya,skrup kayu 3cm,6,lusin,8216
+ORD-2025-000133,2025-08-28,Toko Bangunan Jaya,"pipa pvc 1""",7,btg,42470
+ORD-2025-000134,2025-08-28,Pak Herman,switch tunggal,7,pcs,15330
+ORD-2025-000139,2025-08-31,CV Maju Konstruksi,skrup fischer,15,pcs,2458
+ORD-2025-000140,2025-09-05,Hendra Wijaya,Saklar Tunggal,8,pcs,15194
+ORD-2025-000138,2025-09-06,Hendra Wijaya,CAT TMB,5,kg,46132
+ORD-2025-000141,2025-09-06,Toko Bangunan Jaya,sika plafon,7,kg,36517
+ORD-2025-000142,2025-09-07,CV Berkah Bersama,cat tmbok putih,3,kg,44007
+ORD-2025-000144,2025-09-10,Budi Santoso,Saklar Tunggal,6,pcs,15634
+ORD-2025-000147,2025-09-10,Pak Herman,batu split 1-2,2,m3,299720
+ORD-2025-000149,2025-09-10,Toko Bangunan Jaya,waterproofing 4kg,2,kg,96241
+ORD-2025-000148,2025-09-11,CV Berkah Bersama,BTU MRH,3,lot,848476
+ORD-2025-000150,2025-09-11,Pak Herman,Isotank 500L,1,pcs,760756
+ORD-2025-000146,2025-09-12,Hendra Wijaya,MTR 5M,3,pcs,35943
+ORD-2025-000143,2025-09-13,Budi Santoso,Kabel NYM 2x1.5mm,23,m,12115
+ORD-2025-000145,2025-09-13,Hendra Wijaya,kuas 3in,3,pcs,11556
+ORD-2025-000151,2025-09-15,Hendra Wijaya,fisher screw,10,pcs,2568
+ORD-2025-000154,2025-09-15,Hendra Wijaya,sambungan pipa,5,pcs,8568
+ORD-2025-000153,2025-09-16,Pak Herman,balok 5x10,5,btg,45412
+ORD-2025-000152,2025-09-18,Toko Bangunan Jaya,roll meter 5,3,pcs,34019
+ORD-2025-000157,2025-09-21,Budi Santoso,saklar tunggal,2,pcs,15401
+ORD-2025-000159,2025-09-21,Toko Bangunan Jaya,roll 9 inch,3,pcs,25063
+ORD-2025-000156,2025-09-22,Toko Bangunan Jaya,Paku Biasa 3 inch,4,kg,16442
+ORD-2025-000160,2025-09-24,CV Berkah Bersama,meter 5 m,3,pcs,34701
+ORD-2025-000158,2025-09-25,CV Berkah Bersama,granit 60x60,4,m2,144594
+ORD-2025-000155,2025-09-26,CV Berkah Bersama,s gresik,8,sak,69791
+ORD-2025-000161,2025-09-26,Pak Herman,kayu reng,8,btg,17851
+ORD-2025-000166,2025-09-28,CV Maju Konstruksi,roll meter 5,3,pcs,34799
+ORD-2025-000162,2025-09-29,Toko Bangunan Jaya,semen tiga roda,18,sak,68157
+ORD-2025-000167,2025-09-29,Hendra Wijaya,Gergaji Kayu,2,pcs,63720
+ORD-2025-000169,2025-09-29,Hendra Wijaya,BTU MRH,1,lot,816005
+ORD-2025-000171,2025-09-29,CV Berkah Bersama,MRT LNT,3,sak,77154
+ORD-2025-000165,2025-09-30,Pak Herman,Keramik 40x40 Putih,6,m2,87558
+ORD-2025-000163,2025-10-01,Hendra Wijaya,PVC 3/4,11,btg,36472
+ORD-2025-000170,2025-10-02,Budi Santoso,SKM PLF,6,kg,38636
+ORD-2025-000168,2025-10-03,Pak Herman,balok kayu,7,btg,45310
+ORD-2025-000172,2025-10-03,CV Maju Konstruksi,tank air 500,1,pcs,759343
+ORD-2025-000164,2025-10-04,Toko Bangunan Jaya,stopkontak,9,pcs,22495
+ORD-2025-000179,2025-10-05,CV Berkah Bersama,isotank 500l,1,pcs,725259
+ORD-2025-000175,2025-10-06,Pak Herman,kabel 3x2.5,10,m,18439
+ORD-2025-000173,2025-10-07,CV Maju Konstruksi,skrup fischer,12,pcs,2389
+ORD-2025-000174,2025-10-08,CV Maju Konstruksi,elbow pvc,12,pcs,5086
+ORD-2025-000176,2025-10-11,Pak Herman,gergaji kayu,1,pcs,66734
+ORD-2025-000177,2025-10-11,Pak Herman,reng 3x5,4,btg,17699
+ORD-2025-000178,2025-10-11,Hendra Wijaya,WC 4kg,4,kg,92134
+ORD-2025-000182,2025-10-13,CV Berkah Bersama,Keramik 40x40 Putih,4,m2,85221
+ORD-2025-000181,2025-10-17,Toko Bangunan Jaya,switch tunggal,1,pcs,14311
+ORD-2025-000183,2025-10-17,Toko Bangunan Jaya,triplek 9mm,5,lbr,121242
+ORD-2025-000180,2025-10-18,Hendra Wijaya,paku 2 inch,3,kg,18177
+ORD-2025-000185,2025-10-21,Budi Santoso,balok 5x10,6,btg,44570
+ORD-2025-000184,2025-10-23,CV Maju Konstruksi,holcim 40,11,sak,58391
+ORD-2025-000186,2025-10-24,Budi Santoso,Waterproofing 4kg,4,kg,95691
+ORD-2025-000188,2025-10-26,CV Maju Konstruksi,skrup 3cm,8,lusin,8002
+ORD-2025-000189,2025-10-26,Budi Santoso,rol cat 9 inch,3,pcs,24473
+ORD-2025-000187,2025-10-27,Toko Bangunan Jaya,cat putih 5kg,10,kg,44123
+ORD-2025-000190,2025-11-01,Toko Bangunan Jaya,roll meter 5,1,pcs,34581
+ORD-2025-000191,2025-11-02,Budi Santoso,paku 3in,4,kg,17033
+ORD-2025-000193,2025-11-03,CV Maju Konstruksi,tangki 500,1,pcs,756299
+ORD-2025-000192,2025-11-05,CV Berkah Bersama,batu split 1-2,3,m3,314313
+ORD-2025-000195,2025-11-10,Pak Herman,pipa 1in,8,btg,43896
+ORD-2025-000198,2025-11-11,Budi Santoso,Gergaji Kayu,1,pcs,63092
+ORD-2025-000197,2025-11-12,Budi Santoso,stop kontak,5,pcs,23056
+ORD-2025-000199,2025-11-12,Budi Santoso,ISO 500,1,pcs,763304
+ORD-2025-000196,2025-11-13,Budi Santoso,kabel listrik 1.5,21,m,11436
+ORD-2025-000194,2025-11-15,Pak Herman,pipa pvc 3 4,13,btg,34663
+ORD-2025-000206,2025-11-16,CV Berkah Bersama,tangki 500,1,pcs,745555
+ORD-2025-000201,2025-11-17,Hendra Wijaya,c kayu cklat,4,kg,47149
+ORD-2025-000203,2025-11-19,Hendra Wijaya,KYU RNG,16,btg,17727
+ORD-2025-000202,2025-11-20,Budi Santoso,krm 30x30,6,m2,67379
+ORD-2025-000200,2025-11-21,Pak Herman,SMN 3R,17,sak,68220
+ORD-2025-000205,2025-11-21,CV Maju Konstruksi,grc 60x120,4,lbr,62957
+ORD-2025-000204,2025-11-22,CV Berkah Bersama,SKM PLF,5,kg,36515
+ORD-2025-000214,2025-11-23,Hendra Wijaya,pasir 1m3,5,m3,340378
+ORD-2025-000215,2025-11-23,Budi Santoso,pasir pasang 1m3,3,m3,291547
+ORD-2025-000211,2025-11-24,CV Maju Konstruksi,Saklar Tunggal,3,pcs,15325
+ORD-2025-000213,2025-11-24,Toko Bangunan Jaya,kayu reng,11,btg,17206
+ORD-2025-000209,2025-11-25,Budi Santoso,Pipa PVC 1 inch,5,btg,43056
+ORD-2025-000210,2025-11-25,Hendra Wijaya,Tee PVC 3/4 inch,7,pcs,5758
+ORD-2025-000208,2025-11-26,Hendra Wijaya,skrup kayu 3cm,10,lusin,7602
+ORD-2025-000207,2025-11-29,Toko Bangunan Jaya,cat kayu coklat,6,kg,45646
+ORD-2025-000212,2025-11-29,Toko Bangunan Jaya,GRG KYU,1,pcs,68119
+ORD-2025-000219,2025-11-30,Pak Herman,krm 30x30,4,m2,70622
+ORD-2025-000220,2025-11-30,Hendra Wijaya,balok 5x10,8,btg,46554
+ORD-2025-000221,2025-11-30,CV Maju Konstruksi,TRP 9MM,5,lbr,115981
+ORD-2025-000218,2025-12-01,Hendra Wijaya,tee 3 4,10,pcs,5597
+ORD-2025-000224,2025-12-01,CV Berkah Bersama,split 1/2,1,m3,305236
+ORD-2025-000217,2025-12-04,CV Berkah Bersama,pipa 3/4,8,btg,34482
+ORD-2025-000223,2025-12-04,Hendra Wijaya,pasir pasang,2,m3,292458
+ORD-2025-000222,2025-12-05,CV Berkah Bersama,kayu reng,3,btg,17863
+ORD-2025-000216,2025-12-06,Pak Herman,cat besi merah,3,kg,55206
+ORD-2025-000226,2025-12-08,CV Berkah Bersama,stop kontak,2,pcs,21838
+ORD-2025-000227,2025-12-09,Toko Bangunan Jaya,Triplek 9mm 4x8,7,lbr,120724
+ORD-2025-000225,2025-12-10,Pak Herman,SMN HLC,6,sak,58501
+ORD-2025-000228,2025-12-12,CV Maju Konstruksi,mortar 40kg,6,sak,73278
+ORD-2025-000233,2025-12-15,CV Berkah Bersama,keramik putih,10,m2,88362
+ORD-2025-000235,2025-12-15,Hendra Wijaya,KUS 3IN,5,pcs,12574
+ORD-2025-000230,2025-12-16,Budi Santoso,PVC 1IN,7,btg,43648
+ORD-2025-000232,2025-12-16,Toko Bangunan Jaya,stop kontak,10,pcs,21394
+ORD-2025-000231,2025-12-19,Hendra Wijaya,saklar tunggal,6,pcs,15277
+ORD-2025-000236,2025-12-19,Pak Herman,MTR 5M,3,pcs,33646
+ORD-2025-000237,2025-12-19,Pak Herman,sika plafon,6,kg,38775
+ORD-2025-000229,2025-12-20,Hendra Wijaya,PVC 3/4,5,btg,33622
+ORD-2025-000234,2025-12-20,Toko Bangunan Jaya,granit 60x60,2,m2,152426
+ORD-2025-000240,2025-12-22,CV Berkah Bersama,paku 2 inch,7,kg,17656
+ORD-2025-000241,2025-12-22,Hendra Wijaya,elbow pvc,18,pcs,5154
+ORD-2025-000239,2025-12-23,Budi Santoso,cat kayu 1kg,2,kg,47210
+ORD-2025-000245,2025-12-24,Budi Santoso,MTR 5M,3,pcs,35939
+ORD-2025-000242,2025-12-25,Toko Bangunan Jaya,STP KNK,4,pcs,21255
+ORD-2025-000243,2025-12-26,Pak Herman,kuas 3 inch,3,pcs,11668
+ORD-2025-000244,2025-12-26,Budi Santoso,rol cat 9 inch,2,pcs,24023
+ORD-2025-000238,2025-12-27,CV Maju Konstruksi,Semen Gresik 50kg,4,sak,70736
+ORD-2025-000247,2025-12-28,Toko Bangunan Jaya,Semen Holcim 40kg,4,sak,59997
+ORD-2025-000251,2025-12-28,Budi Santoso,Kabel NYM 2x1.5mm,15,m,11898
+ORD-2025-000253,2025-12-28,Pak Herman,roller 9in,3,pcs,23947
+ORD-2025-000250,2025-12-29,CV Maju Konstruksi,Pipa PVC 1 inch,5,btg,42217
+ORD-2025-000254,2025-12-30,Budi Santoso,pasir beton,3,m3,360799
+ORD-2025-000249,2025-12-31,Budi Santoso,Sekrup Kayu 3cm,8,lusin,7691
+ORD-2025-000248,2026-01-01,Hendra Wijaya,cat besi merah,5,kg,55739
+ORD-2025-000252,2026-01-01,Hendra Wijaya,STP KNK,10,pcs,22042
+ORD-2025-000246,2026-01-03,Hendra Wijaya,semen tiga roda,10,sak,70985
+ORD-2026-000256,2026-01-09,Pak Herman,Kabel NYM 3x2.5mm,14,m,18839
+ORD-2026-000257,2026-01-09,Hendra Wijaya,colokan tanam,7,pcs,21433
+ORD-2026-000255,2026-01-10,Toko Bangunan Jaya,elbow 3/4,12,pcs,5184
+ORD-2026-000260,2026-01-13,Hendra Wijaya,Isotank 500L,1,pcs,723003
+ORD-2026-000259,2026-01-14,CV Berkah Bersama,holcim 40,10,sak,62413
+ORD-2026-000258,2026-01-17,Budi Santoso,semen 3 roda,3,sak,68172
+ORD-2026-000265,2026-01-19,CV Berkah Bersama,meter 5 m,3,pcs,33512
+ORD-2026-000267,2026-01-19,Pak Herman,PSR PSG,2,m3,290851
+ORD-2026-000262,2026-01-21,CV Maju Konstruksi,Saklar Tunggal,5,pcs,15530
+ORD-2026-000264,2026-01-21,Toko Bangunan Jaya,KUS 3IN,3,pcs,12507
+ORD-2026-000266,2026-01-21,CV Maju Konstruksi,pasir beton 1 m3,5,m3,333738
+ORD-2026-000269,2026-01-21,Budi Santoso,tangki 500,1,pcs,718246
+ORD-2026-000268,2026-01-22,CV Berkah Bersama,grc board,2,lbr,67000
+ORD-2026-000261,2026-01-24,CV Berkah Bersama,Semen Holcim 40kg,7,sak,59089
+ORD-2026-000263,2026-01-24,Budi Santoso,stopkontak,8,pcs,22152
+ORD-2026-000272,2026-01-27,Budi Santoso,balok 5x10,8,btg,45549
+ORD-2026-000274,2026-01-28,CV Maju Konstruksi,ISO 500,1,pcs,713663
+ORD-2026-000273,2026-01-29,CV Berkah Bersama,pasir pasang 1m3,3,m3,293785
+ORD-2026-000270,2026-01-30,CV Maju Konstruksi,Meteran 5m,1,pcs,35634
+ORD-2026-000271,2026-01-30,Pak Herman,GRG KYU,1,pcs,63927
+ORD-2026-000275,2026-02-01,CV Berkah Bersama,holcim 40,6,sak,60549
+ORD-2026-000276,2026-02-01,Budi Santoso,Pipa PVC 1 inch,2,btg,42167
+ORD-2026-000279,2026-02-02,Budi Santoso,krm 40x40,8,m2,86082
+ORD-2026-000277,2026-02-04,Hendra Wijaya,elbow 3 4,15,pcs,5036
+ORD-2026-000278,2026-02-04,CV Maju Konstruksi,Kabel NYM 2x1.5mm,20,m,12260
+ORD-2026-000280,2026-02-04,Toko Bangunan Jaya,keramik abu,3,m2,71213
+ORD-2026-000281,2026-02-09,Hendra Wijaya,pipa 3/4,11,btg,33270
+ORD-2026-000283,2026-02-12,CV Maju Konstruksi,roller 9in,5,pcs,24542
+ORD-2026-000282,2026-02-13,CV Berkah Bersama,Kabel NYM 2x1.5mm,26,m,12285
+ORD-2026-000284,2026-02-13,Budi Santoso,batu split,3,m3,293324
+ORD-2026-000286,2026-02-15,CV Berkah Bersama,Tee PVC 3/4 inch,9,pcs,5354
+ORD-2026-000289,2026-02-15,Hendra Wijaya,Gergaji Kayu,1,pcs,64001
+ORD-2026-000288,2026-02-16,CV Berkah Bersama,kuas cat 3,3,pcs,11432
+ORD-2026-000290,2026-02-17,CV Maju Konstruksi,papan grc,3,lbr,66263
+ORD-2026-000287,2026-02-18,CV Maju Konstruksi,keramik abu,5,m2,71444
+ORD-2026-000285,2026-02-20,CV Berkah Bersama,Pipa PVC 1 inch,6,btg,41817
+ORD-2026-000293,2026-02-22,Budi Santoso,kayu reng,7,btg,17563
+ORD-2026-000295,2026-02-22,Hendra Wijaya,sambungan pipa,5,pcs,8118
+ORD-2026-000292,2026-02-24,CV Maju Konstruksi,Kuas Cat 3 inch,1,pcs,12270
+ORD-2026-000291,2026-02-26,Hendra Wijaya,CAT TMB,6,kg,45396
+ORD-2026-000294,2026-02-28,Budi Santoso,pasir pasang 1m3,3,m3,279587
+ORD-2026-000302,2026-03-01,Toko Bangunan Jaya,grc 60x120,3,lbr,63162
+ORD-2026-000303,2026-03-01,Pak Herman,Isotank 500L,1,pcs,721733
+ORD-2026-000299,2026-03-03,Toko Bangunan Jaya,PVC 3/4,14,btg,34548
+ORD-2026-000296,2026-03-05,Budi Santoso,s gresik,11,sak,71942
+ORD-2026-000297,2026-03-05,Pak Herman,SMN HLC,6,sak,58510
+ORD-2026-000301,2026-03-05,CV Maju Konstruksi,GRG KYU,1,pcs,67156
+ORD-2026-000300,2026-03-06,Pak Herman,Kabel NYM 2x1.5mm,11,m,12337
+ORD-2026-000298,2026-03-07,Pak Herman,PKU 3IN,6,kg,17261
+ORD-2026-000304,2026-03-08,Hendra Wijaya,Cat Tembok Putih 5kg,10,kg,44103
+ORD-2026-000307,2026-03-08,Budi Santoso,Sekrup Dinding Fischer,12,pcs,2402
+ORD-2026-000309,2026-03-09,CV Maju Konstruksi,granit 60x60,4,m2,157193
+ORD-2026-000305,2026-03-10,Hendra Wijaya,PKU 3IN,5,kg,17623
+ORD-2026-000308,2026-03-10,Budi Santoso,keramik putih,6,m2,81644
+ORD-2026-000310,2026-03-11,Budi Santoso,mortar 40kg,6,sak,77302
+ORD-2026-000306,2026-03-12,Budi Santoso,skrup kayu 3cm,6,lusin,7935
+ORD-2026-000311,2026-03-13,Budi Santoso,Isotank 500L,1,pcs,757383
+ORD-2026-000314,2026-03-15,CV Berkah Bersama,paku 3in,5,kg,16800
+ORD-2026-000312,2026-03-17,Toko Bangunan Jaya,semen gresik,9,sak,72874
+ORD-2026-000313,2026-03-18,Pak Herman,holcim,7,sak,57677
+ORD-2026-000317,2026-03-19,CV Berkah Bersama,kayu balok,8,btg,44615
+ORD-2026-000319,2026-03-19,CV Maju Konstruksi,Mortar Lantai 40kg,4,sak,71783
+ORD-2026-000315,2026-03-20,Pak Herman,pipa pvc 3/4,3,btg,35448
+ORD-2026-000316,2026-03-20,Hendra Wijaya,KBL NYM,24,m,11789
+ORD-2026-000318,2026-03-20,CV Maju Konstruksi,SKM PLF,7,kg,39789
+ORD-2026-000321,2026-03-22,Pak Herman,SKR FSC,7,pcs,2422
+ORD-2026-000326,2026-03-23,Pak Herman,PSR PSG,2,m3,267580
+ORD-2026-000324,2026-03-25,Hendra Wijaya,GRG KYU,1,pcs,66398
+ORD-2026-000322,2026-03-26,CV Berkah Bersama,kabel listrik 1.5,17,m,12297
+ORD-2026-000323,2026-03-26,Budi Santoso,keramik putih,6,m2,81130
+ORD-2026-000320,2026-03-28,CV Maju Konstruksi,CAT KYU,2,kg,49864
+ORD-2026-000325,2026-03-28,CV Berkah Bersama,kayu reng,9,btg,18293
+ORD-2026-000327,2026-03-29,Pak Herman,"paku biasa 2""",3,kg,17877
+ORD-2026-000330,2026-03-29,Hendra Wijaya,GRG KYU,1,pcs,66019
+ORD-2026-000332,2026-03-29,CV Berkah Bersama,grc board,4,lbr,64626
+ORD-2026-000331,2026-03-30,Toko Bangunan Jaya,TRP 9MM,6,lbr,118886
+ORD-2026-000328,2026-04-03,Hendra Wijaya,sekrup kayu 3,5,lusin,8090
+ORD-2026-000329,2026-04-03,Budi Santoso,ROL 9IN,2,pcs,23880
+ORD-2026-000338,2026-04-06,Budi Santoso,pipa pvc 1 inch,3,btg,40534
+ORD-2026-000339,2026-04-07,Pak Herman,meter 5 m,2,pcs,36598
+ORD-2026-000334,2026-04-10,Hendra Wijaya,cat kayu coklat,2,kg,47740
+ORD-2026-000335,2026-04-10,Hendra Wijaya,paku 2in,7,kg,18746
+ORD-2026-000333,2026-04-11,Hendra Wijaya,semen gresik,7,sak,71400
+ORD-2026-000336,2026-04-11,Hendra Wijaya,Paku Biasa 3 inch,6,kg,16916
+ORD-2026-000337,2026-04-11,Pak Herman,Sekrup Dinding Fischer,4,pcs,2618
+ORD-2026-000340,2026-04-11,Pak Herman,kayu reng,17,btg,17242
+ORD-2026-000341,2026-04-11,CV Maju Konstruksi,KNS PPA,9,pcs,8456
+ORD-2026-000348,2026-04-15,CV Maju Konstruksi,mortar 40kg,3,sak,78520
+ORD-2026-000342,2026-04-16,CV Maju Konstruksi,CAT TMB,8,kg,45766
+ORD-2026-000346,2026-04-16,Budi Santoso,KYU RNG,15,btg,18869
+ORD-2026-000349,2026-04-16,Budi Santoso,waterproofing 4kg,3,kg,93127
+ORD-2026-000343,2026-04-17,Budi Santoso,granit 60x60,3,m2,149828
+ORD-2026-000344,2026-04-17,Toko Bangunan Jaya,MTR 5M,2,pcs,35156
+ORD-2026-000345,2026-04-18,Hendra Wijaya,Kayu Balok 5x10x400,7,btg,43414
+ORD-2026-000347,2026-04-18,Budi Santoso,Pasir Beton 1 Kubik,4,m3,337383
+ORD-2026-000353,2026-04-19,Budi Santoso,kbl nym 2.5,17,m,17318
+ORD-2026-000351,2026-04-21,CV Maju Konstruksi,paku 2in,4,kg,18277
+ORD-2026-000352,2026-04-21,CV Berkah Bersama,Sekrup Kayu 3cm,6,lusin,7632
+ORD-2026-000360,2026-04-21,Toko Bangunan Jaya,tangki 500,1,pcs,754951
+ORD-2026-000350,2026-04-22,CV Maju Konstruksi,SMN HLC,6,sak,61554
+ORD-2026-000358,2026-04-22,Toko Bangunan Jaya,BTU MRH,1,lot,810896
+ORD-2026-000354,2026-04-24,Budi Santoso,Rol Cat 9 inch,3,pcs,25753
+ORD-2026-000355,2026-04-25,Toko Bangunan Jaya,Kayu Balok 5x10x400,7,btg,42943
+ORD-2026-000356,2026-04-25,CV Berkah Bersama,kayu reng,6,btg,17803
+ORD-2026-000357,2026-04-25,Hendra Wijaya,pasir 1m3,4,m3,363606
+ORD-2026-000359,2026-04-25,Toko Bangunan Jaya,sika 5kg,2,kg,39585
+ORD-2026-000365,2026-04-26,Budi Santoso,gergaji kayu,1,pcs,64650
+ORD-2026-000366,2026-04-26,Pak Herman,balok kayu,6,btg,46578
+ORD-2026-000367,2026-04-26,Pak Herman,pasir beton 1 m3,2,m3,345781
+ORD-2026-000369,2026-04-26,Toko Bangunan Jaya,WC 4kg,2,kg,99552
+ORD-2026-000368,2026-04-27,Budi Santoso,mortar 40,5,sak,74839
+ORD-2026-000370,2026-04-27,Budi Santoso,Konektor Sambungan Pipa,6,pcs,8312
+ORD-2026-000361,2026-04-30,CV Berkah Bersama,PKU 3IN,5,kg,16923
+ORD-2026-000362,2026-04-30,Pak Herman,sekrup kayu 3,5,lusin,8102
+ORD-2026-000364,2026-04-30,Budi Santoso,krm 30x30,4,m2,72276
+ORD-2026-000363,2026-05-02,Toko Bangunan Jaya,colokan tanam,8,pcs,22941
+ORD-2026-000374,2026-05-05,CV Berkah Bersama,ROL 9IN,5,pcs,24901
+ORD-2026-000376,2026-05-05,CV Berkah Bersama,pasir halus,4,m3,277954
+ORD-2026-000371,2026-05-06,CV Berkah Bersama,Semen Gresik 50kg,13,sak,67732
+ORD-2026-000373,2026-05-07,Toko Bangunan Jaya,Pipa PVC 1 inch,8,btg,41602
+ORD-2026-000372,2026-05-09,Toko Bangunan Jaya,pipa pvc 3 4,7,btg,36551
+ORD-2026-000375,2026-05-09,Pak Herman,Meteran 5m,3,pcs,35300
+ORD-2026-000378,2026-05-12,Budi Santoso,balok kayu,12,btg,45489
+ORD-2026-000381,2026-05-12,Budi Santoso,waterproofing 4kg,3,kg,92189
+ORD-2026-000382,2026-05-13,CV Maju Konstruksi,konektor,11,pcs,8471
+ORD-2026-000379,2026-05-14,Hendra Wijaya,PSR BTN,2,m3,361086
+ORD-2026-000380,2026-05-14,Pak Herman,BTU MRH,1,lot,886178
+ORD-2026-000377,2026-05-15,Toko Bangunan Jaya,PVC 3/4,8,btg,36030
+ORD-2026-000387,2026-05-17,Budi Santoso,KRM 30,4,m2,72765
+ORD-2026-000384,2026-05-18,Pak Herman,PVC 1IN,5,btg,42823
+ORD-2026-000390,2026-05-18,Hendra Wijaya,pasir 1m3,3,m3,352807
+ORD-2026-000383,2026-05-19,Hendra Wijaya,Paku Biasa 3 inch,5,kg,17738
+ORD-2026-000385,2026-05-19,Toko Bangunan Jaya,kbl nym 2.5,12,m,17517
+ORD-2026-000388,2026-05-20,Budi Santoso,rol cat 9 inch,4,pcs,25456
+ORD-2026-000386,2026-05-21,Hendra Wijaya,switch tunggal,6,pcs,14369
+ORD-2026-000389,2026-05-23,Hendra Wijaya,roll meter 5,3,pcs,35268
+ORD-2026-000394,2026-05-24,Hendra Wijaya,granit putih,3,m2,148977
+ORD-2026-000393,2026-05-25,Pak Herman,Sekrup Dinding Fischer,3,pcs,2508
+ORD-2026-000391,2026-05-26,Toko Bangunan Jaya,cat putih 5kg,12,kg,43836
+ORD-2026-000392,2026-05-28,Toko Bangunan Jaya,"paku biasa 3""",3,kg,16577
+ORD-2026-000396,2026-05-31,Budi Santoso,cat kayu coklat,4,kg,48124
+ORD-2026-000399,2026-06-01,CV Maju Konstruksi,Stop Kontak Tanam,7,pcs,22567
+ORD-2026-000402,2026-06-02,Pak Herman,sika 5kg,5,kg,38684
+ORD-2026-000401,2026-06-03,CV Maju Konstruksi,reng 3 5,12,btg,18885
+ORD-2026-000397,2026-06-04,CV Berkah Bersama,sekrup fischer,3,pcs,2406
+ORD-2026-000400,2026-06-04,CV Berkah Bersama,keramik 30x30,4,m2,70091
+ORD-2026-000395,2026-06-06,CV Berkah Bersama,semen gresik,11,sak,68523
+ORD-2026-000398,2026-06-06,CV Maju Konstruksi,Kabel NYM 3x2.5mm,16,m,17248
+ORD-2026-000404,2026-06-08,Budi Santoso,kabel nym 2x1.5,16,m,11633
+ORD-2026-000407,2026-06-09,Pak Herman,granit 60x60,1,m2,150994
+ORD-2026-000409,2026-06-09,CV Berkah Bersama,Sika Plafon 5kg,4,kg,37774
+ORD-2026-000403,2026-06-10,CV Berkah Bersama,"paku biasa 2""",6,kg,17109
+ORD-2026-000406,2026-06-12,Pak Herman,keramik 30x30,6,m2,72781
+ORD-2026-000405,2026-06-13,Budi Santoso,Saklar Tunggal,9,pcs,14692
+ORD-2026-000408,2026-06-13,Toko Bangunan Jaya,saw kayu,2,pcs,66628
+ORD-2026-000412,2026-06-18,CV Maju Konstruksi,krm 30x30,3,m2,71785
+ORD-2026-000414,2026-06-18,Budi Santoso,waterproof 4kg,4,kg,92361
+ORD-2026-000411,2026-06-19,Budi Santoso,PKU 2IN,5,kg,17526
+ORD-2026-000410,2026-06-20,Budi Santoso,SMN GRK,6,sak,69750
+ORD-2026-000413,2026-06-20,Pak Herman,gergaji kayu,1,pcs,64688
+ORD-2026-000416,2026-06-22,Toko Bangunan Jaya,holcim 40,6,sak,58724
+ORD-2026-000418,2026-06-24,Pak Herman,grnt 60x60,2,m2,150372
+ORD-2026-000419,2026-06-24,Budi Santoso,Kuas Cat 3 inch,4,pcs,12228
+ORD-2026-000421,2026-06-24,Pak Herman,BTU SPL,3,m3,311996
+ORD-2026-000415,2026-06-25,CV Maju Konstruksi,gresik 50kg,3,sak,70411
+ORD-2026-000420,2026-06-26,Toko Bangunan Jaya,Rol Cat 9 inch,3,pcs,25548
+ORD-2026-000417,2026-06-27,CV Berkah Bersama,Kabel NYM 2x1.5mm,23,m,12522
+ORD-2026-000424,2026-06-28,Pak Herman,PSR PSG,4,m3,292045
+ORD-2026-000425,2026-06-28,CV Maju Konstruksi,grc board,4,lbr,61960
+ORD-2026-000423,2026-06-30,Pak Herman,cat putih 5kg,8,kg,43735
+ORD-2026-000422,2026-07-01,CV Maju Konstruksi,Semen Holcim 40kg,5,sak,58601
+ORD-2026-000426,2026-07-05,CV Maju Konstruksi,Kayu Balok 5x10x400,7,btg,46549
+ORD-2026-000427,2026-07-09,CV Maju Konstruksi,plafon sika,6,kg,37520
+ORD-2026-000428,2026-07-10,Pak Herman,tank air 500,1,pcs,750817
+ORD-2026-000429,2026-07-15,Toko Bangunan Jaya,holcim 40,5,sak,59541
+ORD-2026-000434,2026-07-16,Toko Bangunan Jaya,konektor,8,pcs,8768
+ORD-2026-000432,2026-07-17,CV Berkah Bersama,roll 9 inch,3,pcs,25115
+ORD-2026-000433,2026-07-17,Pak Herman,Waterproofing 4kg,3,kg,94318
+ORD-2026-000430,2026-07-18,Budi Santoso,Paku Biasa 3 inch,4,kg,16754
+ORD-2026-000431,2026-07-18,Hendra Wijaya,"pipa pvc 1""",8,btg,40943
+ORD-2026-000441,2026-07-20,Hendra Wijaya,sambungan pipa,5,pcs,8803
+ORD-2026-000436,2026-07-21,Pak Herman,c kayu cklat,4,kg,47242
+ORD-2026-000439,2026-07-21,Budi Santoso,KRM 30,4,m2,68917
+ORD-2026-000435,2026-07-22,CV Maju Konstruksi,Semen Tiga Roda 50kg,16,sak,68251
+ORD-2026-000437,2026-07-24,Toko Bangunan Jaya,kabel nym 2x1.5,11,m,12477
+ORD-2026-000438,2026-07-24,Toko Bangunan Jaya,stopkontak,9,pcs,23053
+ORD-2026-000440,2026-07-24,Pak Herman,kayu balok,12,btg,43221
+ORD-2026-000445,2026-07-26,Toko Bangunan Jaya,granit 60x60,4,m2,155782
+ORD-2026-000448,2026-07-26,Hendra Wijaya,KYU BLK,5,btg,43241
+ORD-2026-000446,2026-07-27,Budi Santoso,ROL 9IN,3,pcs,25792
+ORD-2026-000444,2026-07-28,Toko Bangunan Jaya,pipa pvc 3 4,8,btg,35994
+ORD-2026-000443,2026-07-29,Pak Herman,c besi merah,4,kg,56431
+ORD-2026-000447,2026-07-30,CV Maju Konstruksi,GRG KYU,2,pcs,62134
+ORD-2026-000442,2026-08-01,Pak Herman,semen gresik,17,sak,70618
+ORD-2026-000454,2026-08-02,CV Berkah Bersama,reng 3x5,11,btg,18125
+ORD-2026-000450,2026-08-03,Hendra Wijaya,"paku biasa 3""",6,kg,17668
+ORD-2026-000451,2026-08-03,CV Maju Konstruksi,switch tunggal,9,pcs,15409
+ORD-2026-000455,2026-08-05,CV Berkah Bersama,ISO 500,1,pcs,754693
+ORD-2026-000452,2026-08-06,CV Maju Konstruksi,MTR 5M,2,pcs,34245
+ORD-2026-000453,2026-08-06,CV Berkah Bersama,saw kayu,2,pcs,63939
+ORD-2026-000449,2026-08-07,Toko Bangunan Jaya,paku 2 inch,3,kg,17667
+ORD-2026-000458,2026-08-12,CV Maju Konstruksi,Rol Cat 9 inch,3,pcs,24258
+ORD-2026-000460,2026-08-13,Hendra Wijaya,waterproof 4kg,2,kg,97007
+ORD-2026-000456,2026-08-15,Budi Santoso,paku 2in,4,kg,17963
+ORD-2026-000457,2026-08-15,Hendra Wijaya,switch tunggal,5,pcs,14336
+ORD-2026-000459,2026-08-15,Pak Herman,Kayu Balok 5x10x400,9,btg,47110
+ORD-2026-000466,2026-08-16,Pak Herman,pasir pasang 1m3,4,m3,281434
+ORD-2026-000469,2026-08-16,Hendra Wijaya,konektor,9,pcs,8507
+ORD-2026-000468,2026-08-17,Hendra Wijaya,tangki 500,1,pcs,784813
+ORD-2026-000463,2026-08-18,Hendra Wijaya,"pipa pvc 1""",6,btg,41101
+ORD-2026-000465,2026-08-18,Toko Bangunan Jaya,kuas 3in,6,pcs,11475
+ORD-2026-000461,2026-08-20,Hendra Wijaya,CAT TMB,6,kg,44507
+ORD-2026-000462,2026-08-20,Toko Bangunan Jaya,paku 2 inch,7,kg,18786
+ORD-2026-000464,2026-08-22,Toko Bangunan Jaya,ELB 3/4,13,pcs,5158
+ORD-2026-000467,2026-08-22,CV Berkah Bersama,batu bata,2,lot,817767
+ORD-2026-000471,2026-08-23,Hendra Wijaya,c besi merah,3,kg,53596
+ORD-2026-000472,2026-08-23,Budi Santoso,Paku Biasa 2 inch,4,kg,17596
+ORD-2026-000473,2026-08-23,Toko Bangunan Jaya,Pipa PVC 3/4 inch,6,btg,35559
+ORD-2026-000474,2026-08-26,Toko Bangunan Jaya,PVC 1IN,6,btg,42728
+ORD-2026-000476,2026-08-27,Pak Herman,kuas 3in,4,pcs,12144
+ORD-2026-000475,2026-08-28,Budi Santoso,saklar tunggal,7,pcs,14994
+ORD-2026-000477,2026-08-28,Pak Herman,Gergaji Kayu,2,pcs,62955
+ORD-2026-000470,2026-08-29,Hendra Wijaya,SMN GRK,5,sak,70463
+ORD-2026-000481,2026-08-30,Budi Santoso,kabel nym 2x1.5,24,m,11520
+ORD-2026-000483,2026-08-30,Budi Santoso,stop kontak,5,pcs,21176
+ORD-2026-000478,2026-09-01,Toko Bangunan Jaya,Cat Kayu Coklat 1kg,3,kg,48536
+ORD-2026-000482,2026-09-01,Budi Santoso,Saklar Tunggal,4,pcs,15028
+ORD-2026-000484,2026-09-01,Pak Herman,Keramik 30x30 Abu-abu,5,m2,67928
+ORD-2026-000479,2026-09-04,Toko Bangunan Jaya,"paku biasa 2""",5,kg,18674
+ORD-2026-000485,2026-09-04,Hendra Wijaya,Pasir Beton 1 Kubik,4,m3,355384
+ORD-2026-000486,2026-09-04,Toko Bangunan Jaya,WRC 4KG,3,kg,90788
+ORD-2026-000480,2026-09-05,Hendra Wijaya,SKR KYU,9,lusin,7794
+ORD-2026-000487,2026-09-05,CV Berkah Bersama,KNS PPA,6,pcs,8700
+ORD-2026-000490,2026-09-07,CV Berkah Bersama,ELB 3/4,9,pcs,5216
+ORD-2026-000492,2026-09-07,Pak Herman,pasir beton,3,m3,365013
+ORD-2026-000489,2026-09-08,Hendra Wijaya,pipa pvc 3 4,8,btg,33397
+ORD-2026-000488,2026-09-10,Toko Bangunan Jaya,"paku biasa 2""",7,kg,17607
+ORD-2026-000491,2026-09-10,Toko Bangunan Jaya,grnt 60x60,2,m2,155003
+ORD-2026-000493,2026-09-13,CV Maju Konstruksi,Sekrup Kayu 3cm,3,lusin,8160
+ORD-2026-000495,2026-09-15,Budi Santoso,keramik abu,6,m2,71618
+ORD-2026-000494,2026-09-18,Budi Santoso,stopkontak,9,pcs,21342
+ORD-2026-000496,2026-09-20,CV Berkah Bersama,paku 2in,3,kg,17878
+ORD-2026-000497,2026-09-20,Hendra Wijaya,paku 3in,4,kg,17701
+ORD-2026-000499,2026-09-21,Pak Herman,papan grc,2,lbr,63209
+ORD-2026-000498,2026-09-22,Hendra Wijaya,saklar 1,6,pcs,14681
+ORD-2026-000501,2026-09-27,Pak Herman,KYU BLK,7,btg,45676
+ORD-2026-000500,2026-09-30,Budi Santoso,Paku Biasa 2 inch,8,kg,18531
+ORD-2026-000502,2026-10-01,Toko Bangunan Jaya,Isotank 500L,1,pcs,730285
+ORD-2026-000509,2026-10-05,Toko Bangunan Jaya,Bata Merah 1000pcs,2,lot,846157
+ORD-2026-000506,2026-10-06,CV Maju Konstruksi,colokan tanam,6,pcs,21308
+ORD-2026-000504,2026-10-08,Budi Santoso,"paku biasa 3""",4,kg,17798
+ORD-2026-000508,2026-10-08,CV Maju Konstruksi,split 1/2,2,m3,314964
+ORD-2026-000505,2026-10-09,CV Maju Konstruksi,skrup kayu 3cm,4,lusin,8339
+ORD-2026-000503,2026-10-10,Hendra Wijaya,semen gresik,10,sak,72245
+ORD-2026-000507,2026-10-10,Hendra Wijaya,PSR PSG,3,m3,274854
+ORD-2026-000510,2026-10-10,Toko Bangunan Jaya,mortar 40kg,4,sak,76947

@@ -1,0 +1,722 @@
+[
+  {
+    "filename": "receipt_0001.png",
+    "date": "2025-11-06",
+    "customer": "Pak Herman",
+    "items": [
+      {
+        "item_name": "s gresik",
+        "sku_id": "SMN002",
+        "qty": 2.0,
+        "unit": "sak",
+        "unit_price": 67392,
+        "line_total": 134784
+      }
+    ],
+    "total": 134784,
+    "true_total": 134784,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0002.png",
+    "date": "2025-08-25",
+    "customer": "Budi Santoso",
+    "items": [
+      {
+        "item_name": "saw kayu",
+        "sku_id": "ALT004",
+        "qty": 1.0,
+        "unit": "pcs",
+        "unit_price": 63627,
+        "line_total": 63627
+      }
+    ],
+    "total": 63627,
+    "true_total": 63627,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0003.png",
+    "date": "2026-07-16",
+    "customer": "Pembeli Umum",
+    "items": [
+      {
+        "item_name": "CAT KYU",
+        "sku_id": "CAT003",
+        "qty": 1.0,
+        "unit": "kg",
+        "unit_price": 48672,
+        "line_total": 48672
+      }
+    ],
+    "total": 48672,
+    "true_total": 48672,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0004.png",
+    "date": "2026-03-07",
+    "customer": "Budi Santoso",
+    "items": [
+      {
+        "item_name": "Pasir Beton 1 Kubik",
+        "sku_id": "PSR001",
+        "qty": 2.0,
+        "unit": "m3",
+        "unit_price": 367253,
+        "line_total": 734506
+      }
+    ],
+    "total": 734506,
+    "true_total": 734506,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0005.png",
+    "date": "2026-06-17",
+    "customer": "Pelanggan Toko",
+    "items": [
+      {
+        "item_name": "balok kayu",
+        "sku_id": "KYU001",
+        "qty": 2.0,
+        "unit": "btg",
+        "unit_price": 45737,
+        "line_total": 91474
+      }
+    ],
+    "total": 91474,
+    "true_total": 91474,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0006.png",
+    "date": "2026-04-23",
+    "customer": "CV Maju Konstruksi",
+    "items": [
+      {
+        "item_name": "keramik putih",
+        "sku_id": "KRM001",
+        "qty": 1.0,
+        "unit": "m2",
+        "unit_price": 84263,
+        "line_total": 84263
+      }
+    ],
+    "total": 86523,
+    "true_total": 84263,
+    "intentional_error": true
+  },
+  {
+    "filename": "receipt_0007.png",
+    "date": "2025-04-13",
+    "customer": "CV Maju Konstruksi",
+    "items": [
+      {
+        "item_name": "SMN 3R",
+        "sku_id": "SMN001",
+        "qty": 6.0,
+        "unit": "sak",
+        "unit_price": 68615,
+        "line_total": 411690
+      }
+    ],
+    "total": 402567,
+    "true_total": 411690,
+    "intentional_error": true
+  },
+  {
+    "filename": "receipt_0008.png",
+    "date": "2026-07-19",
+    "customer": "Toko Bangunan Jaya",
+    "items": [
+      {
+        "item_name": "holcim 40",
+        "sku_id": "SMN003",
+        "qty": 3.0,
+        "unit": "sak",
+        "unit_price": 57884,
+        "line_total": 173652
+      }
+    ],
+    "total": 173652,
+    "true_total": 173652,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0009.png",
+    "date": "2025-09-19",
+    "customer": "CV Maju Konstruksi",
+    "items": [
+      {
+        "item_name": "krm 30x30",
+        "sku_id": "KRM002",
+        "qty": 2.0,
+        "unit": "m2",
+        "unit_price": 66803,
+        "line_total": 133606
+      }
+    ],
+    "total": 140090,
+    "true_total": 133606,
+    "intentional_error": true
+  },
+  {
+    "filename": "receipt_0010.png",
+    "date": "2026-08-22",
+    "customer": "Pembeli Umum",
+    "items": [
+      {
+        "item_name": "WRC 4KG",
+        "sku_id": "WRC001",
+        "qty": 1.0,
+        "unit": "kg",
+        "unit_price": 96579,
+        "line_total": 96579
+      }
+    ],
+    "total": 96579,
+    "true_total": 96579,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0011.png",
+    "date": "2025-09-25",
+    "customer": "Pak Herman",
+    "items": [
+      {
+        "item_name": "kbl nym 2.5",
+        "sku_id": "KBL002",
+        "qty": 4.0,
+        "unit": "m",
+        "unit_price": 17687,
+        "line_total": 70748
+      }
+    ],
+    "total": 70748,
+    "true_total": 70748,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0012.png",
+    "date": "2026-07-09",
+    "customer": "CV Berkah Bersama",
+    "items": [
+      {
+        "item_name": "Paku Biasa 2 inch",
+        "sku_id": "PKU001",
+        "qty": 3.0,
+        "unit": "kg",
+        "unit_price": 17750,
+        "line_total": 53250
+      }
+    ],
+    "total": 59589,
+    "true_total": 53250,
+    "intentional_error": true
+  },
+  {
+    "filename": "receipt_0013.png",
+    "date": "2025-09-14",
+    "customer": "Pelanggan Toko",
+    "items": [
+      {
+        "item_name": "Rol Cat 9 inch",
+        "sku_id": "ALT002",
+        "qty": 3.0,
+        "unit": "pcs",
+        "unit_price": 24452,
+        "line_total": 73356
+      }
+    ],
+    "total": 73356,
+    "true_total": 73356,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0014.png",
+    "date": "2026-06-07",
+    "customer": null,
+    "items": [
+      {
+        "item_name": "PSR BTN",
+        "sku_id": "PSR001",
+        "qty": 6.0,
+        "unit": "m3",
+        "unit_price": 345632,
+        "line_total": 2073792
+      }
+    ],
+    "total": 2073792,
+    "true_total": 2073792,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0015.png",
+    "date": "2025-06-10",
+    "customer": "Toko Bangunan Jaya",
+    "items": [
+      {
+        "item_name": "fisher screw",
+        "sku_id": "SKR002",
+        "qty": 3.0,
+        "unit": "pcs",
+        "unit_price": 2558,
+        "line_total": 7674
+      }
+    ],
+    "total": 7674,
+    "true_total": 7674,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0016.png",
+    "date": "2025-08-24",
+    "customer": "Hendra Wijaya",
+    "items": [
+      {
+        "item_name": "gresik 50kg",
+        "sku_id": "SMN002",
+        "qty": 4.0,
+        "unit": "sak",
+        "unit_price": 71711,
+        "line_total": 286844
+      }
+    ],
+    "total": 286844,
+    "true_total": 286844,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0017.png",
+    "date": "2026-05-07",
+    "customer": "CV Maju Konstruksi",
+    "items": [
+      {
+        "item_name": "Semen Tiga Roda 50kg",
+        "sku_id": "SMN001",
+        "qty": 18.0,
+        "unit": "sak",
+        "unit_price": 70528,
+        "line_total": 1269504
+      }
+    ],
+    "total": 1269504,
+    "true_total": 1269504,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0018.png",
+    "date": "2026-04-19",
+    "customer": "Pembeli Umum",
+    "items": [
+      {
+        "item_name": "batu split 1-2",
+        "sku_id": "BTU001",
+        "qty": 3.0,
+        "unit": "m3",
+        "unit_price": 297982,
+        "line_total": 893946
+      }
+    ],
+    "total": 896157,
+    "true_total": 893946,
+    "intentional_error": true
+  },
+  {
+    "filename": "receipt_0019.png",
+    "date": "2026-07-05",
+    "customer": "CV Berkah Bersama",
+    "items": [
+      {
+        "item_name": "stopkontak",
+        "sku_id": "STP001",
+        "qty": 3.0,
+        "unit": "pcs",
+        "unit_price": 22626,
+        "line_total": 67878
+      }
+    ],
+    "total": 67878,
+    "true_total": 67878,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0020.png",
+    "date": "2025-04-25",
+    "customer": "CV Berkah Bersama",
+    "items": [
+      {
+        "item_name": "plafon sika",
+        "sku_id": "SKM001",
+        "qty": 2.0,
+        "unit": "kg",
+        "unit_price": 37772,
+        "line_total": 75544
+      }
+    ],
+    "total": 75544,
+    "true_total": 75544,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0021.png",
+    "date": "2026-10-01",
+    "customer": "Pelanggan Toko",
+    "items": [
+      {
+        "item_name": "skrup 3cm",
+        "sku_id": "SKR001",
+        "qty": 5.0,
+        "unit": "lusin",
+        "unit_price": 8062,
+        "line_total": 40310
+      }
+    ],
+    "total": 40310,
+    "true_total": 40310,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0022.png",
+    "date": "2026-05-23",
+    "customer": null,
+    "items": [
+      {
+        "item_name": "konektor pipa",
+        "sku_id": "KNS001",
+        "qty": 7.0,
+        "unit": "pcs",
+        "unit_price": 8477,
+        "line_total": 59339
+      }
+    ],
+    "total": 59339,
+    "true_total": 59339,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0023.png",
+    "date": "2026-04-03",
+    "customer": "Pembeli Umum",
+    "items": [
+      {
+        "item_name": "paku 3in",
+        "sku_id": "PKU002",
+        "qty": 1.0,
+        "unit": "kg",
+        "unit_price": 17458,
+        "line_total": 17458
+      }
+    ],
+    "total": 17458,
+    "true_total": 17458,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0024.png",
+    "date": "2025-10-03",
+    "customer": null,
+    "items": [
+      {
+        "item_name": "Kuas Cat 3 inch",
+        "sku_id": "ALT001",
+        "qty": 2.0,
+        "unit": "pcs",
+        "unit_price": 12312,
+        "line_total": 24624
+      }
+    ],
+    "total": 24624,
+    "true_total": 24624,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0025.png",
+    "date": "2026-01-25",
+    "customer": "Pembeli Umum",
+    "items": [
+      {
+        "item_name": "GRC Board 60x120",
+        "sku_id": "GRC001",
+        "qty": 1.0,
+        "unit": "lbr",
+        "unit_price": 63790,
+        "line_total": 63790
+      }
+    ],
+    "total": 63790,
+    "true_total": 63790,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0026.png",
+    "date": "2026-05-15",
+    "customer": null,
+    "items": [
+      {
+        "item_name": "roll 9 inch",
+        "sku_id": "ALT002",
+        "qty": 1.0,
+        "unit": "pcs",
+        "unit_price": 24887,
+        "line_total": 24887
+      }
+    ],
+    "total": 24887,
+    "true_total": 24887,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0027.png",
+    "date": "2025-06-11",
+    "customer": "Toko Bangunan Jaya",
+    "items": [
+      {
+        "item_name": "skrup fischer",
+        "sku_id": "SKR002",
+        "qty": 2.0,
+        "unit": "pcs",
+        "unit_price": 2555,
+        "line_total": 5110
+      }
+    ],
+    "total": 5110,
+    "true_total": 5110,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0028.png",
+    "date": "2026-09-10",
+    "customer": "CV Berkah Bersama",
+    "items": [
+      {
+        "item_name": "split 1/2",
+        "sku_id": "BTU001",
+        "qty": 1.0,
+        "unit": "m3",
+        "unit_price": 290171,
+        "line_total": 290171
+      }
+    ],
+    "total": 290171,
+    "true_total": 290171,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0029.png",
+    "date": "2025-05-29",
+    "customer": "Pembeli Umum",
+    "items": [
+      {
+        "item_name": "semen 3 roda",
+        "sku_id": "SMN001",
+        "qty": 1.0,
+        "unit": "sak",
+        "unit_price": 66684,
+        "line_total": 66684
+      }
+    ],
+    "total": 66684,
+    "true_total": 66684,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0030.png",
+    "date": "2025-06-15",
+    "customer": "Budi Santoso",
+    "items": [
+      {
+        "item_name": "GRC Board 60x120",
+        "sku_id": "GRC001",
+        "qty": 1.0,
+        "unit": "lbr",
+        "unit_price": 63877,
+        "line_total": 63877
+      }
+    ],
+    "total": 63877,
+    "true_total": 63877,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0031.png",
+    "date": "2025-07-18",
+    "customer": "Toko Bangunan Jaya",
+    "items": [
+      {
+        "item_name": "PVC 1IN",
+        "sku_id": "PVC002",
+        "qty": 2.0,
+        "unit": "btg",
+        "unit_price": 41721,
+        "line_total": 83442
+      }
+    ],
+    "total": 83442,
+    "true_total": 83442,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0032.png",
+    "date": "2026-02-03",
+    "customer": "Pelanggan Toko",
+    "items": [
+      {
+        "item_name": "cat besi 1kg",
+        "sku_id": "CAT002",
+        "qty": 2.0,
+        "unit": "kg",
+        "unit_price": 56841,
+        "line_total": 113682
+      }
+    ],
+    "total": 113682,
+    "true_total": 113682,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0033.png",
+    "date": "2025-07-02",
+    "customer": "Budi Santoso",
+    "items": [
+      {
+        "item_name": "Isotank 500L",
+        "sku_id": "ISO001",
+        "qty": 1.0,
+        "unit": "pcs",
+        "unit_price": 738842,
+        "line_total": 738842
+      }
+    ],
+    "total": 738842,
+    "true_total": 738842,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0034.png",
+    "date": "2026-03-26",
+    "customer": "Pembeli Umum",
+    "items": [
+      {
+        "item_name": "Mortar Lantai 40kg",
+        "sku_id": "SKM002",
+        "qty": 2.0,
+        "unit": "sak",
+        "unit_price": 73369,
+        "line_total": 146738
+      }
+    ],
+    "total": 146738,
+    "true_total": 146738,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0035.png",
+    "date": "2025-12-24",
+    "customer": "CV Maju Konstruksi",
+    "items": [
+      {
+        "item_name": "Tee PVC 3/4 inch",
+        "sku_id": "FTG002",
+        "qty": 5.0,
+        "unit": "pcs",
+        "unit_price": 5568,
+        "line_total": 27840
+      }
+    ],
+    "total": 27840,
+    "true_total": 27840,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0036.png",
+    "date": "2025-12-26",
+    "customer": "Toko Bangunan Jaya",
+    "items": [
+      {
+        "item_name": "Keramik 30x30 Abu-abu",
+        "sku_id": "KRM002",
+        "qty": 3.0,
+        "unit": "m2",
+        "unit_price": 72499,
+        "line_total": 217497
+      }
+    ],
+    "total": 217497,
+    "true_total": 217497,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0037.png",
+    "date": "2025-11-18",
+    "customer": "Pelanggan Toko",
+    "items": [
+      {
+        "item_name": "semen gresik",
+        "sku_id": "SMN002",
+        "qty": 13.0,
+        "unit": "sak",
+        "unit_price": 69234,
+        "line_total": 900042
+      }
+    ],
+    "total": 900042,
+    "true_total": 900042,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0038.png",
+    "date": "2025-10-15",
+    "customer": "Pak Herman",
+    "items": [
+      {
+        "item_name": "SMN HLC",
+        "sku_id": "SMN003",
+        "qty": 4.0,
+        "unit": "sak",
+        "unit_price": 58413,
+        "line_total": 233652
+      }
+    ],
+    "total": 233652,
+    "true_total": 233652,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0039.png",
+    "date": "2026-05-04",
+    "customer": "Pelanggan Toko",
+    "items": [
+      {
+        "item_name": "grc 60x120",
+        "sku_id": "GRC001",
+        "qty": 3.0,
+        "unit": "lbr",
+        "unit_price": 67475,
+        "line_total": 202425
+      }
+    ],
+    "total": 202425,
+    "true_total": 202425,
+    "intentional_error": false
+  },
+  {
+    "filename": "receipt_0040.png",
+    "date": "2025-09-19",
+    "customer": null,
+    "items": [
+      {
+        "item_name": "triplek 9mm",
+        "sku_id": "KYU002",
+        "qty": 2.0,
+        "unit": "lbr",
+        "unit_price": 125895,
+        "line_total": 251790
+      }
+    ],
+    "total": 251790,
+    "true_total": 251790,
+    "intentional_error": false
+  }
+]
