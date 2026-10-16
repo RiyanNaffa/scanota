@@ -1,0 +1,175 @@
+# ==============================================================
+# scanota .gitignore
+# ==============================================================
+
+# --------------------------------------------------------------
+# Secrets and credentials (NEVER commit these)
+# --------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+secrets/
+credentials.json
+service-account*.json
+.streamlit/secrets.toml
+evolus/*.secret*
+evolus/**/api_key*
+
+# --------------------------------------------------------------
+# Python
+# --------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+ENV/
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+.python-version
+
+# Tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pyre/
+.hypothesis/
+.tox/
+.nox/
+
+# Coverage
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# --------------------------------------------------------------
+# Jupyter / notebooks
+# --------------------------------------------------------------
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+# Large generated outputs from notebooks (keep the .ipynb itself)
+notebooks/outputs/
+notebooks/tmp/
+
+# --------------------------------------------------------------
+# Node / frontend (if dashboard uses Next.js or similar)
+# --------------------------------------------------------------
+node_modules/
+.next/
+out/
+.nuxt/
+.vite/
+.cache/
+.parcel-cache/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
+# --------------------------------------------------------------
+# Docker
+# --------------------------------------------------------------
+docker-compose.override.yml
+docker-compose.local.yml
+.docker/
+
+# --------------------------------------------------------------
+# Database and local storage
+# --------------------------------------------------------------
+*.sqlite
+*.sqlite3
+*.db
+pgdata/
+postgres-data/
+db-data/
+volumes/
+dump.sql
+*.dump
+*.bak
+
+# --------------------------------------------------------------
+# Data (keep small synthetic samples, ignore everything else)
+# --------------------------------------------------------------
+data/raw/
+data/private/
+data/real/
+data/tmp/
+data/processed/
+data/uploads/
+uploads/
+# Keep the demo samples:
+!data/sample_receipts/
+!data/sample_transactions/
+
+# --------------------------------------------------------------
+# Models and ML artifacts (reference by name, don't commit weights)
+# --------------------------------------------------------------
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.gguf
+*.onnx
+*.ckpt
+*.h5
+*.pkl
+*.joblib
+models/
+checkpoints/
+.huggingface/
+huggingface/
+hf_cache/
+wandb/
+mlruns/
+
+# --------------------------------------------------------------
+# Logs and temp files
+# --------------------------------------------------------------
+*.log
+logs/
+tmp/
+temp/
+*.tmp
+*.swp
+*.swo
+*~
+
+# --------------------------------------------------------------
+# IDE / editor
+# --------------------------------------------------------------
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.example.json
+.idea/
+*.iml
+.history/
+
+# --------------------------------------------------------------
+# OS files
+# --------------------------------------------------------------
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# --------------------------------------------------------------
+# Misc
+# --------------------------------------------------------------
+*.zip
+*.tar.gz
+*.rar
+!data/sample_receipts/*.zip
