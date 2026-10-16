@@ -1,0 +1,28 @@
+# evolus/endpoints.yaml
+# Evolus REST API endpoint configuration.
+# Fill in the actual paths and formats from Evolus documentation.
+# All TO_CONFIRM values must be replaced before enabling EVOLUS_ENABLED=true.
+
+run_extractor:
+  method: POST
+  path: TO_CONFIRM           # e.g. /api/v1/extractors/{extractor_id}/run
+  request_format: TO_CONFIRM # e.g. {"document_url": "...", "workspace_id": "..."}
+  # Docs: https://docs.evolus.ai/extractors (confirm actual path)
+
+trigger_workflow:
+  method: POST
+  path: TO_CONFIRM           # e.g. /api/v1/workflows/{workflow_id}/trigger
+  request_format: TO_CONFIRM # e.g. {"input": {...}, "workspace_id": "..."}
+  # Docs: https://docs.evolus.ai/workflows (confirm actual path)
+
+run_ai_tool:
+  method: POST
+  path: TO_CONFIRM           # optional: AI Tool endpoint
+  request_format: TO_CONFIRM
+  # Docs: (confirm actual path)
+
+query_library:
+  method: GET
+  path: TO_CONFIRM           # optional: Knowledge Library query endpoint
+  request_format: TO_CONFIRM
+  # Docs: (confirm actual path)
