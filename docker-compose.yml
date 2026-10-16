@@ -1,0 +1,72 @@
+# ============================================================
+# scanota docker-compose.yml
+# Services: db (Phase 1), api (Phase 2), dashboard (Phase 10)
+# ============================================================
+
+volumes:
+  pgdata:
+  storage:
+
+services:
+
+  # ----------------------------------------------------------
+  # db: PostgreSQL 16 with schema init
+  # ----------------------------------------------------------
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER:      ${POSTGRES_USER}
+      POSTGRES_PASSWORD:  ${POSTGRES_PASSWORD}
+      POSTGRES_DB:        ${POSTGRES_DB}
+      POSTGRES_RO_PASSWORD: ${POSTGRES_RO_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./app/db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./app/db/init/02-roles.sh:/docker-entrypoint-initdb.d/02-roles.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    # Port 5432 is NOT published by default. Set POSTGRES_PORT=5432 in .env to expose it.
+    ports:
+      - "${POSTGRES_PORT:-}:5432"
+
+  # ----------------------------------------------------------
+  # api: FastAPI backend (added in Phase 2)
+  # ----------------------------------------------------------
+  api:
+    build:
+      context: .
+      dockerfile: app/Dockerfile
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL:          ${DATABASE_URL}
+      DATABASE_READONLY_URL: ${DATABASE_READONLY_URL}
+      STORAGE_DIR:           /srv/storage
+    volumes:
+      - storage:/srv/storage
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # ----------------------------------------------------------
+  # dashboard: Streamlit UI (added in Phase 10)
+  # ----------------------------------------------------------
+  dashboard:
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      API_BASE_URL: http://api:8000
+    ports:
+      - "8501:8501"
+    depends_on:
+      - api
