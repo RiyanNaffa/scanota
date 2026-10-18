@@ -31,3 +31,36 @@ def test_falls_back_when_body_is_not_json():
 
 def test_timeout_with_empty_message_still_says_something():
     assert _error(httpx.ReadTimeout("", request=_REQUEST)) == {"error": "ReadTimeout"}
+
+
+def _real_api():
+    """The real api_client. The view tests replace its functions with canned ones, and Streamlit's
+    AppTest can leave that patched module in sys.modules, so reload it before testing the original."""
+    import importlib
+
+    import dashboard.api_client as api
+
+    return importlib.reload(api)
+
+
+def test_health_timeout_means_busy_not_offline(monkeypatch):
+    api = _real_api()
+
+    def slow(*args, **kwargs):
+        raise httpx.ReadTimeout("", request=_REQUEST)
+
+    monkeypatch.setattr(api.httpx, "get", slow)
+
+    health = api.health()
+    assert health["status"] == "ok" and health["busy"] is True
+
+
+def test_health_refused_connection_is_offline(monkeypatch):
+    api = _real_api()
+
+    def refused(*args, **kwargs):
+        raise httpx.ConnectError("refused", request=_REQUEST)
+
+    monkeypatch.setattr(api.httpx, "get", refused)
+
+    assert "error" in api.health()

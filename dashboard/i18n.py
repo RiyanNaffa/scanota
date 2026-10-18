@@ -4,10 +4,7 @@ from __future__ import annotations
 
 import streamlit as st
 
-from dashboard.helpers import flag_data_uri
 from dashboard.strings import DEFAULT_LANG, LANGS, translate
-
-_LABELS = {"id": "ID", "en": "EN"}
 
 
 def get_lang() -> str:
@@ -30,17 +27,13 @@ def t(key: str, **values: object) -> str:
 
 
 def language_switch() -> None:
-    """Two buttons with a flag each; the active one is highlighted."""
+    """Two equal buttons, ID and EN. The flag is drawn by CSS inside each button (see theme.py), so
+    it is always centred with the label, and the two columns are kept side by side on a phone."""
     st.caption(t("sidebar.language"))
     current = get_lang()
-    cols = st.columns([1, 2, 1, 2], vertical_alignment="center")
-    for slot, lang in zip((0, 2), LANGS, strict=True):
-        cols[slot].markdown(
-            f'<img class="flag" src="{flag_data_uri(lang)}" alt="{_LABELS[lang]}">',
-            unsafe_allow_html=True,
-        )
-        cols[slot + 1].button(
-            _LABELS[lang],
+    for column, lang in zip(st.columns(2), LANGS, strict=True):
+        column.button(
+            lang.upper(),
             key=f"lang_{lang}",
             use_container_width=True,
             type="primary" if lang == current else "secondary",

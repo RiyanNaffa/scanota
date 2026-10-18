@@ -12,10 +12,10 @@ from __future__ import annotations
 import streamlit as st
 
 import dashboard.api_client as api
-from dashboard.helpers import build_queue
+from dashboard.helpers import MAX_UPLOAD_MB, build_queue
 from dashboard.i18n import t
 from dashboard.theme import ICON, pill
-from dashboard.widgets import render_issues, status_pill
+from dashboard.widgets import clear_restock_cache, render_issues, status_pill
 
 st.title(f"{ICON['scan']} {t('scan.title')}")
 st.caption(t("scan.subtitle"))
@@ -49,7 +49,7 @@ if source == "upload":
         accept_multiple_files=True,
         key=f"upload_{nonce}",
     )
-    st.caption(t("scan.upload.note"))
+    st.caption(t("scan.upload.note", mb=MAX_UPLOAD_MB))
     chosen = [{"name": u.name, "data": u.getvalue(), "type": u.type} for u in uploads or []]
 else:
     photo = st.camera_input(t("scan.camera.label"), key=f"camera_{nonce}")
@@ -60,7 +60,8 @@ else:
 # Not yet scanned, one entry per distinct image
 queue = build_queue(chosen, state["scan_done"])
 
-button_scan, button_clear, _ = st.columns([2, 2, 5])
+with st.container(key="actions_scan"):
+    button_scan, button_clear = st.columns(2)
 if button_scan.button(
     t("scan.button", n=len(queue)),
     type="primary",
@@ -77,6 +78,7 @@ if button_scan.button(
             "result": result,
         }
     queue = []
+    clear_restock_cache()  # new sales change the forecast
 if button_clear.button(
     t("scan.clear"),
     icon=ICON["clear"],

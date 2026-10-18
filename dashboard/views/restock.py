@@ -8,11 +8,16 @@ import streamlit as st
 import dashboard.api_client as api
 from dashboard.i18n import get_lang, t
 from dashboard.theme import ICON, pill
+from dashboard.widgets import clear_restock_cache, restock_cached
 
 st.title(f"{ICON['restock']} {t('restock.title')}")
 st.caption(t("restock.subtitle"))
 
-items = api.restock(lang=get_lang())
+if flash := st.session_state.pop("restock_flash", None):
+    st.success(flash, icon=ICON["check"])
+
+with st.spinner(t("restock.loading")):
+    items = restock_cached(get_lang())
 if not isinstance(items, list):
     st.error(t("restock.load_error"), icon=ICON["error"])
     st.stop()
@@ -101,7 +106,9 @@ with left.container(border=True):
     if st.button(t("restock.save"), icon=ICON["save"], key=f"save_{sku}"):
         result = api.update_stock(sku, new_stock)
         if isinstance(result, dict) and "error" not in result:
-            st.success(t("restock.saved"), icon=ICON["check"])
+            clear_restock_cache()  # the forecast and the table must see the new stock
+            st.session_state["restock_flash"] = t("restock.saved")
+            st.rerun()
         else:
             st.error(t("restock.save_failed"), icon=ICON["error"])
 

@@ -47,7 +47,17 @@ def _post(
 
 
 def health() -> dict:
-    return _get("/health")
+    """Reachability for the sidebar. The API holds the CPU while it computes a forecast, so a
+    health check that times out means "up but busy", not "offline"; only a refused or failed
+    connection is reported as an error."""
+    try:
+        r = httpx.get(f"{API_BASE_URL}/health", timeout=2)
+        r.raise_for_status()
+        return r.json()
+    except httpx.TimeoutException:
+        return {"status": "ok", "busy": True}
+    except httpx.HTTPError as e:
+        return _error(e)
 
 
 def summary(date_from=None, date_to=None) -> dict:

@@ -9,6 +9,7 @@ import dashboard.api_client as api
 from dashboard.helpers import fmt_rupiah
 from dashboard.i18n import get_lang, t
 from dashboard.theme import ICON
+from dashboard.widgets import restock_cached
 
 st.title(f"{ICON['overview']} {t('overview.title')}")
 st.caption(t("overview.subtitle"))
@@ -17,10 +18,11 @@ col_from, col_to = st.columns(2)
 date_from = col_from.date_input(t("common.from"), value=None)
 date_to = col_to.date_input(t("common.to"), value=None)
 
-data = api.summary(
-    date_from=date_from.isoformat() if date_from else None,
-    date_to=date_to.isoformat() if date_to else None,
-)
+with st.spinner(t("overview.loading")):
+    data = api.summary(
+        date_from=date_from.isoformat() if date_from else None,
+        date_to=date_to.isoformat() if date_to else None,
+    )
 
 if not isinstance(data, dict) or "error" in data:
     st.warning(t("overview.load_error"))
@@ -62,7 +64,8 @@ if top:
             },
         )
 
-restock = api.restock(lang=get_lang())
+with st.spinner(t("restock.loading")):
+    restock = restock_cached(get_lang())
 if isinstance(restock, list) and restock:
     st.subheader(f"{ICON['restock']} {t('overview.restock')}")
     cols = st.columns(3)

@@ -9,7 +9,7 @@ import dashboard.api_client as api
 from dashboard.helpers import fmt_rupiah
 from dashboard.i18n import t
 from dashboard.theme import ICON
-from dashboard.widgets import render_issues, status_pill
+from dashboard.widgets import clear_restock_cache, render_issues, status_pill
 
 st.title(f"{ICON['review']} {t('review.title')}")
 st.caption(t("review.subtitle"))
@@ -20,7 +20,8 @@ flash = state.pop("review_flash", None)  # message that must survive the rerun a
 if flash:
     st.success(flash, icon=ICON["check"])
 
-items = api.review_list(limit=50)
+with st.spinner(t("review.loading")):
+    items = api.review_list(limit=50)
 if not isinstance(items, list) or not items:
     st.info(t("review.none"), icon=ICON["info"])
     st.stop()
@@ -44,7 +45,8 @@ selected_id = st.selectbox(
     t("review.select"), options=list(by_id), format_func=lambda tid: _label(by_id[tid])
 )
 
-tx = api.transaction_detail(selected_id)
+with st.spinner(t("review.loading_detail")):
+    tx = api.transaction_detail(selected_id)
 if not isinstance(tx, dict) or "error" in tx:
     st.error(t("common.error"), icon=ICON["error"])
     st.stop()
@@ -53,7 +55,8 @@ col_photo, col_detail = st.columns([1, 2])
 with col_photo.container(border=True):
     st.markdown(f"**{t('review.photo')}**")
     if tx.get("receipt_image_path"):
-        image = api.receipt_image(selected_id)
+        with st.spinner(t("review.loading_detail")):
+            image = api.receipt_image(selected_id)
         if image:
             st.image(image, use_container_width=True)
         else:
@@ -93,7 +96,8 @@ with col_detail:
         ]
         st.dataframe(df, hide_index=True, use_container_width=True)
 
-    confirm, skip, _ = st.columns([3, 2, 4])
+    with st.container(key="actions_review"):
+        confirm, skip = st.columns(2)
     if confirm.button(
         t("review.confirm"), type="primary", icon=ICON["check"], use_container_width=True
     ):
@@ -115,8 +119,10 @@ with col_detail:
             "save_aliases": True,
             "force": True,
         }
-        result = api.confirm_transaction(selected_id, body)
+        with st.spinner(t("review.saving")):
+            result = api.confirm_transaction(selected_id, body)
         if isinstance(result, dict) and "error" not in result:
+            clear_restock_cache()
             state["review_flash"] = t("review.confirmed")
             st.rerun()
         else:

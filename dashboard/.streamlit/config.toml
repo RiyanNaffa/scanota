@@ -7,8 +7,14 @@ textColor = "#f1f5e4"
 font = "sans serif"
 
 [client]
-# "viewer" hides the Deploy button and the developer menu entries (the app runs on its own VM)
-toolbarMode = "viewer"
+# "minimal" hides the Deploy button and the three-dot menu (Rerun, Settings, Print, Record a
+# screencast, About). The app runs on its own VM and the menu is of no use to its visitors.
+toolbarMode = "minimal"
+
+[server]
+# Per file, in MB. Keep equal to MAX_UPLOAD_MB in the API settings and below the reverse
+# proxy limit (Caddy: request_body max_size 12MB, a little more for the multipart envelope).
+maxUploadSize = 10
 
 [browser]
 gatherUsageStats = false

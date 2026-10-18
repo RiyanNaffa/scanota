@@ -16,9 +16,9 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-import dashboard.api_client as api  # noqa: E402
 from dashboard.i18n import language_switch, t  # noqa: E402
 from dashboard.theme import ICON, inject_css, status_dot  # noqa: E402
+from dashboard.widgets import api_online  # noqa: E402
 
 inject_css()
 
@@ -51,11 +51,15 @@ with st.sidebar:
     st.write("")
     with st.container(border=True, key="lang_card"):
         language_switch()
-    health = api.health()
-    online = isinstance(health, dict) and health.get("status") == "ok"
-    st.markdown(
-        status_dot(online, t("sidebar.api_online" if online else "sidebar.api_offline")),
-        unsafe_allow_html=True,
-    )
+    status_slot = st.empty()  # filled once the health check is done, below
+
+# The check can take up to 2 s when the API is busy (and is then cached for 10 s), so it
+# shows a message instead of leaving the page empty
+with st.spinner(t("common.loading")):
+    online = api_online()
+status_slot.markdown(
+    status_dot(online, t("sidebar.api_online" if online else "sidebar.api_offline")),
+    unsafe_allow_html=True,
+)
 
 current.run()

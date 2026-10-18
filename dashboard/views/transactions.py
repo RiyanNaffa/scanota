@@ -27,13 +27,14 @@ status = c2.selectbox(
 date_from = c3.date_input(t("common.from"), value=None)
 date_to = c4.date_input(t("common.to"), value=None)
 
-rows = api.transactions(
-    channel=None if channel == ALL else channel,
-    status=None if status == ALL else status,
-    date_from=date_from.isoformat() if date_from else None,
-    date_to=date_to.isoformat() if date_to else None,
-    limit=200,
-)
+with st.spinner(t("tx.loading")):
+    rows = api.transactions(
+        channel=None if channel == ALL else channel,
+        status=None if status == ALL else status,
+        date_from=date_from.isoformat() if date_from else None,
+        date_to=date_to.isoformat() if date_to else None,
+        limit=200,
+    )
 
 if not isinstance(rows, list):
     st.error(t("tx.load_error"), icon=ICON["error"])

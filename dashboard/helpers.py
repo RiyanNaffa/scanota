@@ -5,6 +5,10 @@ from __future__ import annotations
 import base64
 import hashlib
 
+# Largest receipt photo, in MB. Must equal server.maxUploadSize in .streamlit/config.toml and
+# MAX_UPLOAD_MB in the API settings (tests/unit/test_dashboard_i18n.py checks all three).
+MAX_UPLOAD_MB = 10
+
 # Flags are inline SVG, not emoji: Windows browsers draw flag emoji as the letters "ID" / "GB".
 _FLAG_SVG = {
     "id": (

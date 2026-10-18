@@ -5,6 +5,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+import pytest
+
 from dashboard.helpers import file_key, flag_data_uri, fmt_rupiah
 from dashboard.strings import DEFAULT_LANG, LANGS, STRINGS, translate
 
@@ -102,3 +104,24 @@ def test_build_queue_skips_images_that_were_already_scanned():
 
     assert [q["name"] for q in queue] == ["b.jpg"]
     assert build_queue([{"name": "a.jpg", "data": b"aaa"}], done) == []
+
+
+def test_upload_limit_is_the_same_in_the_dashboard_config_the_ui_and_the_api():
+    import tomllib
+
+    pytest.importorskip("pydantic_settings")  # the dashboard image has no API settings
+    from app.config import Settings
+    from dashboard.helpers import MAX_UPLOAD_MB
+
+    with open("dashboard/.streamlit/config.toml", "rb") as f:
+        config = tomllib.load(f)
+
+    assert config["server"]["maxUploadSize"] == MAX_UPLOAD_MB
+    assert Settings(_env_file=None).max_upload_mb == MAX_UPLOAD_MB
+
+
+def test_toolbar_menu_is_hidden():
+    import tomllib
+
+    with open("dashboard/.streamlit/config.toml", "rb") as f:
+        assert tomllib.load(f)["client"]["toolbarMode"] == "minimal"

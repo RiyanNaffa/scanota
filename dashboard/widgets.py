@@ -6,9 +6,39 @@ import html
 
 import streamlit as st
 
+import dashboard.api_client as api
 from dashboard.i18n import t
 from dashboard.strings import STRINGS
 from dashboard.theme import pill
+
+
+@st.cache_data(ttl=60, show_spinner=False)
+def _restock(lang: str) -> list:
+    data = api.restock(lang=lang)
+    if not isinstance(data, list):
+        raise RuntimeError("restock request failed")  # an exception is never cached
+    return data
+
+
+def restock_cached(lang: str) -> list | dict:
+    """The restock list, kept for a minute. It takes seconds to compute and both the overview and
+    the restock page need it. Errors are not cached: they come back as {"error": ...}."""
+    try:
+        return _restock(lang)
+    except RuntimeError:
+        return {"error": "restock request failed"}
+
+
+@st.cache_data(ttl=10, show_spinner=False)
+def api_online() -> bool:
+    """Is the API reachable? Kept for 10 s so navigating between pages does not re-check each time."""
+    health = api.health()
+    return isinstance(health, dict) and health.get("status") == "ok"
+
+
+def clear_restock_cache() -> None:
+    """Call after anything that changes stock or sales, so the next view recomputes."""
+    _restock.clear()
 
 
 def status_pill(status: str) -> str:

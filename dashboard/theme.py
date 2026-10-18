@@ -11,6 +11,8 @@ from pathlib import Path
 
 import streamlit as st
 
+from dashboard.helpers import flag_data_uri
+
 PALETTE = {
     "black": "#000000",
     "surface": "#3e432e",
@@ -53,7 +55,9 @@ _CSS = """
 .block-container { padding-top: 2.2rem; max-width: 1280px; }
 
 /* Streamlit chrome: no Deploy button (the app is hosted on a VM) */
-.stAppDeployButton, [data-testid="stAppDeployButton"], .stDeployButton { display: none !important; }
+.stAppDeployButton, [data-testid="stAppDeployButton"], .stDeployButton, [data-testid="stMainMenu"] {
+  display: none !important;
+}
 
 /* Sidebar: same black as the page, a hairline border instead of a second fill */
 section[data-testid="stSidebar"] { background: var(--bg); border-right: 1px solid var(--line); }
@@ -68,10 +72,21 @@ section[data-testid="stSidebar"] [data-testid="stPageLink-NavLink"] {
   border-radius: 8px; padding: 0.45rem 0.7rem; margin: 0.1rem 0;
 }
 section[data-testid="stSidebar"] [data-testid="stPageLink-NavLink"]:hover { background: rgba(97, 111, 57, 0.28); }
-section[data-testid="stSidebar"] img.flag {
-  width: 26px; height: auto; display: block; border-radius: 3px; margin: 0 auto;
-  box-shadow: 0 0 0 1px rgba(241, 245, 228, 0.25);
+/* Language switch: two equal buttons, the flag drawn inside each one. Streamlit stacks columns
+   below 640 px, so they are forced to stay in one row there. */
+.st-key-lang_card [data-testid="stHorizontalBlock"] { flex-wrap: nowrap !important; gap: 8px; }
+.st-key-lang_card [data-testid="stColumn"] { min-width: 0 !important; width: auto !important; flex: 1 1 0 !important; }
+.st-key-lang_id button, .st-key-lang_en button {
+  display: flex; align-items: center; justify-content: center; gap: 8px; height: 38px;
 }
+.st-key-lang_id button p, .st-key-lang_en button p { margin: 0; }
+.st-key-lang_id button::before, .st-key-lang_en button::before {
+  content: ""; flex: none; width: 22px; height: 15px; border-radius: 3px;
+  background-size: cover; background-position: center; background-repeat: no-repeat;
+  box-shadow: 0 0 0 1px rgba(241, 245, 228, 0.3);
+}
+.st-key-lang_id button::before { background-image: url("__FLAG_ID__"); }
+.st-key-lang_en button::before { background-image: url("__FLAG_EN__"); }
 /* The language card: a bordered, padded, rounded box with the sidebar's own background */
 .st-key-lang_card { padding: 14px 14px 10px; border-radius: 12px; background: transparent; }
 
@@ -102,6 +117,37 @@ h1 span, h2 span, h3 span { vertical-align: middle; }
 .stButton > button[kind="primary"]:hover { filter: brightness(1.08); color: #000000; }
 .stButton > button:disabled { opacity: 0.45; }
 [data-testid^="stBaseButton-segmented_control"] { border-radius: 8px !important; }
+/* Photo source switch: two equal buttons side by side with the icon spaced from the label.
+   A grid, because Streamlit sizes the group to its content and the buttons stay icon-wide;
+   it fills the width on a phone and stops at 520 px on a desktop. */
+.st-key-scan_source [data-baseweb="button-group"] {
+  display: grid !important; grid-template-columns: 1fr 1fr; gap: 8px;
+  width: 100% !important; max-width: 520px !important;
+}
+.st-key-scan_source [data-testid^="stBaseButton-segmented_control"] {
+  width: auto !important; min-width: 0 !important; margin: 0 !important; height: 42px;
+  padding: 4px 14px !important; gap: 10px; white-space: nowrap;
+  display: flex !important; align-items: center !important; justify-content: center !important;
+}
+/* The label's markdown container has a -1rem bottom margin that pushes the text below the icon */
+.st-key-scan_source [data-testid^="stBaseButton-segmented_control"] [data-testid="stMarkdownContainer"],
+.st-key-scan_source [data-testid^="stBaseButton-segmented_control"] p { margin: 0 !important; }
+@media (max-width: 420px) {
+  .st-key-scan_source [data-testid^="stBaseButton-segmented_control"] { padding: 4px 8px !important; gap: 6px; }
+}
+/* Action buttons in a row: each keeps a readable width and wraps onto the next line when the
+   window narrows, instead of being squeezed (Streamlit only stacks columns below 640 px). */
+[class*="st-key-actions_"] [data-testid="stHorizontalBlock"] { flex-wrap: wrap !important; gap: 12px; }
+[class*="st-key-actions_"] [data-testid="stColumn"] {
+  flex: 0 1 220px !important; min-width: 190px !important; width: auto !important;
+}
+/* "Confirm without changes" is a long label: its button needs more than the default 220 px */
+.st-key-actions_review [data-testid="stColumn"]:first-child {
+  flex-basis: 280px !important; min-width: 250px !important;
+}
+@media (max-width: 640px) {
+  [class*="st-key-actions_"] [data-testid="stColumn"] { flex: 1 1 100% !important; }
+}
 
 /* Inputs, tables, progress */
 [data-testid="stFileUploaderDropzone"] { border: 1px dashed var(--olive); border-radius: 10px; }
@@ -151,6 +197,9 @@ def _logo_data_uri() -> str:
 
 def inject_css() -> None:
     css = _CSS.replace("__LOGO__", _logo_data_uri())
+    css = css.replace("__FLAG_ID__", flag_data_uri("id")).replace(
+        "__FLAG_EN__", flag_data_uri("en")
+    )
     for name, value in PALETTE.items():
         css = css.replace(f"__{name}__", value)
     st.markdown(css, unsafe_allow_html=True)

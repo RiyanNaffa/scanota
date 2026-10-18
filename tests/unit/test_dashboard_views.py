@@ -6,9 +6,11 @@ where Streamlit is missing. The API client is replaced by canned data: no networ
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 
-pytest.importorskip("streamlit")
+st = pytest.importorskip("streamlit")
 from streamlit.testing.v1 import AppTest  # noqa: E402
 
 import dashboard.api_client as api  # noqa: E402
@@ -85,6 +87,7 @@ REVIEW_DETAIL = {
 
 @pytest.fixture(autouse=True)
 def fake_api(monkeypatch):
+    st.cache_data.clear()  # restock_cached keeps results for a minute; start every test clean
     monkeypatch.setattr(api, "health", lambda: {"status": "ok"})
     monkeypatch.setattr(api, "summary", lambda **kw: SUMMARY)
     monkeypatch.setattr(api, "restock", lambda explain=None, lang="id": RESTOCK)
@@ -154,3 +157,40 @@ def test_ask_page_passes_the_language_to_the_api():
 
     assert not at.exception
     assert any("ANSWER-en" in m.value for m in at.markdown)
+
+
+def test_restock_is_cached_for_a_minute_and_errors_are_not(monkeypatch):
+    from dashboard.widgets import clear_restock_cache, restock_cached
+
+    monkeypatch.setattr(api, "restock", lambda explain=None, lang="id": {"error": "down"})
+    assert "error" in restock_cached("id")  # an outage is reported ...
+
+    monkeypatch.setattr(api, "restock", lambda explain=None, lang="id": ["first"])
+    assert restock_cached("id") == ["first"]  # ... and not remembered once the API is back
+
+    monkeypatch.setattr(api, "restock", lambda explain=None, lang="id": ["second"])
+    assert restock_cached("id") == ["first"]  # served from the cache
+    clear_restock_cache()
+    assert restock_cached("id") == ["second"]  # recomputed after a stock or sales change
+
+
+@pytest.mark.parametrize(
+    ("path", "message"),
+    [
+        ("app.py", "common.loading"),
+        ("views/overview.py", "overview.loading"),
+        ("views/scan.py", "scan.running"),
+        ("views/review.py", "review.loading"),
+        ("views/review.py", "review.loading_detail"),
+        ("views/review.py", "review.saving"),
+        ("views/restock.py", "restock.loading"),
+        ("views/ask.py", "ask.spinner"),
+        ("views/transactions.py", "tx.loading"),
+    ],
+)
+def test_every_page_shows_a_loading_message_while_it_waits(path, message):
+    """A spinner is too short-lived to catch in a test, so check it is wired into the page."""
+    source = Path(f"dashboard/{path}").read_text(encoding="utf-8")
+
+    assert "st.spinner" in source
+    assert f't("{message}"' in source
