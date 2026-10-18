@@ -15,8 +15,6 @@ secrets/
 credentials.json
 service-account*.json
 .streamlit/secrets.toml
-evolus/*.secret*
-evolus/**/api_key*
 
 # --------------------------------------------------------------
 # Python

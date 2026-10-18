@@ -70,13 +70,6 @@ class Settings(BaseSettings):
     storage_dir: str = "/srv/storage"
     max_upload_mb: int = 10
 
-    # Evolus
-    evolus_base_url: str = ""
-    evolus_api_key: str = ""
-    evolus_workspace_id: str = ""
-    evolus_enabled: bool = False
-    extraction_backend: str = "direct"  # "direct" or "evolus"
-
     # Safety-stock z for categories without their own entry in app/forecast/category_policy.py.
     # 2.2 is the backtest's value for ~5 % stockouts on goods that keep (1.65 gave ~9 %).
     safety_stock_z: float = 2.2
