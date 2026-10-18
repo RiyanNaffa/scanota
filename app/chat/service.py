@@ -7,7 +7,7 @@ from typing import Any
 
 from sqlalchemy.orm import Session
 
-from app.chat.prompts import ANSWER_SYSTEM_PROMPT, SQL_SYSTEM_PROMPT
+from app.chat.prompts import SQL_SYSTEM_PROMPT, answer_prompt
 from app.chat.sql_guard import UnsafeSQL, validate_sql
 from app.llm import call_with_retry, completion_kwargs, make_client, message_text
 
@@ -15,10 +15,10 @@ logger = logging.getLogger(__name__)
 MAX_QUESTION_LENGTH = 500
 
 
-def chat(db: Session, question: str) -> dict[str, Any]:
+def chat(db: Session, question: str, lang: str = "id") -> dict[str, Any]:
     """Process a natural-language question and return an answer with supporting SQL.
 
-    Returns dict: {answer, sql, columns, rows}
+    `lang` ("id" or "en") is the language of the answer. Returns dict: {answer, sql, columns, rows}
     Raises ValueError on input errors.
     Raises RuntimeError if LLM is not configured.
     """
@@ -48,6 +48,7 @@ def chat(db: Session, question: str) -> dict[str, Any]:
             settings,
             question,
             error_feedback=f"SQL tidak valid: {e}. Perbaiki dan kembalikan hanya SQL SELECT.",
+            previous_sql=sql_raw,
         )
         try:
             safe_sql = validate_sql(sql_raw)
@@ -58,7 +59,7 @@ def chat(db: Session, question: str) -> dict[str, Any]:
     columns, rows = _execute_sql(db, safe_sql)
 
     # Step 4: generate answer
-    answer = _generate_answer(client, settings, question, columns, rows)
+    answer = _generate_answer(client, settings, question, columns, rows, lang)
 
     return {
         "answer": answer,
@@ -68,12 +69,22 @@ def chat(db: Session, question: str) -> dict[str, Any]:
     }
 
 
-def _generate_sql(client, settings, question: str, error_feedback: str | None = None) -> str:
+def _generate_sql(
+    client,
+    settings,
+    question: str,
+    error_feedback: str | None = None,
+    previous_sql: str = "",
+) -> str:
     messages = [{"role": "system", "content": SQL_SYSTEM_PROMPT}]
-    if error_feedback:
+    if error_feedback and previous_sql.strip():
+        # Show the model its own rejected SQL, so the feedback has something to point at.
         messages.append({"role": "user", "content": question})
-        messages.append({"role": "assistant", "content": ""})
+        messages.append({"role": "assistant", "content": previous_sql})
         messages.append({"role": "user", "content": error_feedback})
+    elif error_feedback:
+        # Nothing usable came back the first time (an empty assistant turn can be rejected).
+        messages.append({"role": "user", "content": question + "\n\n" + error_feedback})
     else:
         messages.append({"role": "user", "content": question})
 
@@ -113,11 +124,18 @@ def _execute_sql(db: Session, sql: str) -> tuple[list[str], list[list]]:
         raise ValueError(f"SQL execution error: {e}") from e
 
 
-def _generate_answer(client, settings, question: str, columns: list[str], rows: list[list]) -> str:
-    data_str = f"Kolom: {columns}\nData ({len(rows)} baris): {rows[:20]}"
+def _generate_answer(
+    client, settings, question: str, columns: list[str], rows: list[list], lang: str = "id"
+) -> str:
+    if lang == "en":
+        data_str = f"Columns: {columns}\nData ({len(rows)} rows): {rows[:20]}"
+        user_text = f"Question: {question}\n\n{data_str}"
+    else:
+        data_str = f"Kolom: {columns}\nData ({len(rows)} baris): {rows[:20]}"
+        user_text = f"Pertanyaan: {question}\n\n{data_str}"
     messages = [
-        {"role": "system", "content": ANSWER_SYSTEM_PROMPT},
-        {"role": "user", "content": f"Pertanyaan: {question}\n\n{data_str}"},
+        {"role": "system", "content": answer_prompt(lang)},
+        {"role": "user", "content": user_text},
     ]
     # The data is already computed by SQL; this only phrases it, so light reasoning is enough.
     resp = call_with_retry(
@@ -130,4 +148,7 @@ def _generate_answer(client, settings, question: str, columns: list[str], rows: 
         ),
         settings=settings,
     )
-    return message_text(resp, "chat answer") or "Tidak dapat menghasilkan jawaban."
+    fallback = (
+        "Could not generate an answer." if lang == "en" else "Tidak dapat menghasilkan jawaban."
+    )
+    return message_text(resp, "chat answer") or fallback

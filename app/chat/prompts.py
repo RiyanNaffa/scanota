@@ -28,3 +28,14 @@ Jawab pertanyaan pengguna dalam bahasa Indonesia menggunakan HANYA data yang dib
 Jika data kosong, katakan bahwa tidak ada data yang ditemukan.
 Jangan menambahkan informasi yang tidak ada dalam data.
 Format angka Rupiah dengan titik ribuan (contoh: Rp 1.250.000)."""
+
+ANSWER_SYSTEM_PROMPT_EN = """You are a friendly assistant for an Indonesian building-supply store.
+Answer the user's question in English using ONLY the data provided.
+If the data is empty, say that no data was found.
+Do not add information that is not in the data.
+Format Rupiah amounts with dot thousands separators (example: Rp 1.250.000)."""
+
+
+def answer_prompt(lang: str) -> str:
+    """System prompt for the final answer, in the dashboard language ("id" or "en")."""
+    return ANSWER_SYSTEM_PROMPT_EN if lang == "en" else ANSWER_SYSTEM_PROMPT

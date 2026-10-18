@@ -40,51 +40,30 @@ def create_app() -> FastAPI:
     )
 
     # ------------------------------------------------------------------
-    # Routers (added incrementally per phase)
+    # Routers. Imported without try/except on purpose: a router that fails to import must stop
+    # the app at startup. Swallowing the error used to hide a missing endpoint behind a healthy
+    # /health.
     # ------------------------------------------------------------------
+    from app.api.chat import router as chat_router
     from app.api.health import router as health_router
+    from app.api.ingest import router as ingest_router
+    from app.api.products import router as products_router
+    from app.api.restock import router as restock_router
+    from app.api.review import router as review_router
+    from app.api.summary import router as summary_router
+    from app.api.transactions import router as tx_router
 
-    application.include_router(health_router)
-
-    # Phase 4 routers
-    try:
-        from app.api.ingest import router as ingest_router
-        from app.api.products import router as products_router
-        from app.api.review import router as review_router
-        from app.api.summary import router as summary_router
-        from app.api.transactions import router as tx_router
-
-        application.include_router(ingest_router)
-        application.include_router(tx_router)
-        application.include_router(review_router)
-        application.include_router(products_router)
-        application.include_router(summary_router)
-    except ImportError:
-        pass
-
-    # Phase 7 routers
-    try:
-        from app.api.restock import router as restock_router
-
-        application.include_router(restock_router)
-    except ImportError:
-        pass
-
-    # Phase 8 routers
-    try:
-        from app.api.chat import router as chat_router
-
-        application.include_router(chat_router)
-    except ImportError:
-        pass
-
-    # Phase 9 Evolus stats
-    try:
-        from app.api.evolus import router as evolus_router
-
-        application.include_router(evolus_router)
-    except ImportError:
-        pass
+    for router in (
+        health_router,
+        ingest_router,
+        tx_router,
+        review_router,
+        products_router,
+        summary_router,
+        restock_router,
+        chat_router,
+    ):
+        application.include_router(router)
 
     logger.info("scanota app created (env=%s)", settings.app_env)
     return application
