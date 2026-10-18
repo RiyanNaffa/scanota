@@ -20,6 +20,7 @@ EXPECTED = {
     ("GET", "/restock"),
     ("GET", "/restock/{sku_id}/series"),
     ("POST", "/chat"),
+    ("POST", "/chat/answer"),
 }
 
 

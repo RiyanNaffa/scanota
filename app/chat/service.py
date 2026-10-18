@@ -15,10 +15,14 @@ logger = logging.getLogger(__name__)
 MAX_QUESTION_LENGTH = 500
 
 
-def chat(db: Session, question: str, lang: str = "id") -> dict[str, Any]:
-    """Process a natural-language question and return an answer with supporting SQL.
+def chat(db: Session, question: str, lang: str = "id", with_answer: bool = True) -> dict[str, Any]:
+    """Process a natural-language question and return the SQL, its rows and a written answer.
 
-    `lang` ("id" or "en") is the language of the answer. Returns dict: {answer, sql, columns, rows}
+    `lang` ("id" or "en") is the language of the answer. Returns dict: {answer, sql, columns, rows}.
+    With `with_answer=False` the answer is None and only the SQL and the rows are returned, so a
+    caller can show them at once and ask for the wording afterwards with `phrase_answer`.
+    The written answer is only a rewording of rows that are already in hand: if the model is slow
+    or down it is None, and the call still succeeds.
     Raises ValueError on input errors.
     Raises RuntimeError if LLM is not configured.
     """
@@ -58,8 +62,10 @@ def chat(db: Session, question: str, lang: str = "id") -> dict[str, Any]:
     # Step 3: execute
     columns, rows = _execute_sql(db, safe_sql)
 
-    # Step 4: generate answer
-    answer = _generate_answer(client, settings, question, columns, rows, lang)
+    # Step 4: generate answer (optional polish: a failure here must not lose the result)
+    answer = None
+    if with_answer:
+        answer = _phrase(client, settings, question, columns, rows, lang)
 
     return {
         "answer": answer,
@@ -67,6 +73,27 @@ def chat(db: Session, question: str, lang: str = "id") -> dict[str, Any]:
         "columns": columns,
         "rows": rows,
     }
+
+
+def phrase_answer(question: str, columns: list[str], rows: list[list], lang: str = "id"):
+    """The written answer for rows that are already known, or None when the model cannot give one.
+
+    Raises RuntimeError if LLM is not configured.
+    """
+    from app.config import get_settings
+
+    settings = get_settings()
+    if not settings.llm_base_url or not settings.llm_api_key:
+        raise RuntimeError("LLM_BASE_URL and LLM_API_KEY must be configured for chat.")
+    return _phrase(make_client(settings), settings, question, columns, rows, lang)
+
+
+def _phrase(client, settings, question, columns, rows, lang) -> str | None:
+    try:
+        return _generate_answer(client, settings, question, columns, rows, lang)
+    except Exception as e:  # timeout, 429, 5xx, an unreadable reply: the rows are still good
+        logger.warning("chat answer not generated (%s: %s)", type(e).__name__, e)
+        return None
 
 
 def _generate_sql(
@@ -147,6 +174,9 @@ def _generate_answer(
             **completion_kwargs(settings.llm_reasoning_effort_text, settings.llm_max_tokens_answer),
         ),
         settings=settings,
+        # Optional polish: ride out a 1 s concurrency limit, never sleep through a 60 s one
+        max_retries=1,
+        max_delay=5.0,
     )
     fallback = (
         "Could not generate an answer." if lang == "en" else "Tidak dapat menghasilkan jawaban."

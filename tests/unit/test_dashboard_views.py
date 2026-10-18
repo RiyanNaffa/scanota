@@ -99,12 +99,15 @@ def fake_api(monkeypatch):
     monkeypatch.setattr(
         api,
         "chat",
-        lambda question, lang="id": {
-            "answer": f"ANSWER-{lang}",
+        lambda question, lang="id", answer=True: {
+            "answer": f"ANSWER-{lang}" if answer else None,
             "sql": "SELECT 1",
-            "rows": [],
-            "columns": [],
+            "rows": [[1]],
+            "columns": ["n"],
         },
+    )
+    monkeypatch.setattr(
+        api, "chat_answer", lambda question, columns, rows, lang="id": {"answer": f"ANSWER-{lang}"}
     )
 
 
@@ -157,6 +160,56 @@ def test_ask_page_passes_the_language_to_the_api():
 
     assert not at.exception
     assert any("ANSWER-en" in m.value for m in at.markdown)
+
+
+def test_ask_shows_the_query_result_before_it_asks_for_the_wording(monkeypatch):
+    calls: list[str] = []
+
+    def chat(question, lang="id", answer=True):
+        calls.append(f"chat(answer={answer})")
+        return {"answer": None, "sql": "SELECT 1", "rows": [[1]], "columns": ["n"]}
+
+    def chat_answer(question, columns, rows, lang="id"):
+        calls.append("chat_answer")
+        return {"answer": "THE-WORDING"}
+
+    monkeypatch.setattr(api, "chat", chat)
+    monkeypatch.setattr(api, "chat_answer", chat_answer)
+    at = _run("ask", "en")
+    at.button[0].click().run()
+
+    assert not at.exception
+    assert calls == ["chat(answer=False)", "chat_answer"]  # the rows first, the wording second
+    assert any("THE-WORDING" in m.value for m in at.markdown)
+    assert at.code[0].value == "SELECT 1"
+
+
+@pytest.mark.parametrize("reply", [{"answer": None}, {"error": "timed out"}])
+def test_ask_keeps_the_table_and_sql_when_the_wording_is_unavailable(monkeypatch, reply):
+    monkeypatch.setattr(api, "chat_answer", lambda question, columns, rows, lang="id": reply)
+    at = _run("ask", "en")
+    at.button[0].click().run()
+
+    assert not at.exception
+    assert at.code[0].value == "SELECT 1"  # the query is shown
+    assert len(at.dataframe) == 1  # and so are the rows
+    assert any("not available" in c.value for c in at.caption)  # with a note instead of an error
+    assert not at.error
+
+
+def test_ask_does_not_ask_for_the_wording_twice(monkeypatch):
+    wordings: list[int] = []
+
+    def chat_answer(question, columns, rows, lang="id"):
+        wordings.append(1)
+        return {"answer": "W"}
+
+    monkeypatch.setattr(api, "chat_answer", chat_answer)
+    at = _run("ask", "en")
+    at.button[0].click().run()
+    at.run()  # any later rerun of the page
+
+    assert len(wordings) == 1
 
 
 def test_restock_is_cached_for_a_minute_and_errors_are_not(monkeypatch):

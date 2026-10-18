@@ -439,3 +439,50 @@ Every Markdown file was read against the code, the compose file, the Makefile, C
 - `localhost` in a browser can resolve to `[::1]`; the dashboard answered on `localhost` here (Docker Desktop on Windows), and a Linux VM was not tried
 
 ---
+
+
+## Restock failed after a stock update on the VM – 2026-10-18
+
+**Report:** after changing the stock of Isotank 500L on the Restock page the restock data could not be loaded; after a short wait and a refresh it loaded. `/health` was healthy. The API log the user pasted ended with a `/chat` traceback (`openai.APITimeoutError` from the answer-phrasing call), which is a different request; it held no restock error
+
+**Cause (inferred from timing, the VM log was not seen):** `/restock` recomputed the demand model of every SKU on every call, with no cache in the API. Measured here, on a 20-core machine: 4.3 s for one call, and 25.5 s each for four at once (6x slower, not 4x, because the calls fight over the CPU). The dashboard waited at most 30 s. A stock update clears the dashboard's 60 s cache, so the next view computes everything again; on a small VM that can pass 30 s, the dashboard gives up with an error while the API keeps computing for nothing, and a refresh straight away starts a second computation on top of it. After waiting, the CPU is free and one call finishes in time. That fits every part of the report. The stock does not change the forecast, so recomputing it was wasted work
+
+**What was done**
+- `app/forecast/service.py`: `cached_forecast` keeps each SKU's model result under a fingerprint of its sales series, behind a lock. `build_restock_list` and `get_forecast_series` use it. Six tests (`tests/unit/test_forecast_cache.py`): same series once, a new sale or another horizon recomputes, a failed run is not kept, the caller cannot change the cached copy, six threads at once compute once, and a stock update does not rerun the model
+- `dashboard/api_client.py`: the two forecast calls wait up to 120 s instead of 30 s (a test pins this), for the first request after an API restart, which still computes everything
+- `docs/architecture.md`: the cache and the timeout
+
+**Measured** on the rebuilt stack: `/restock` 0.025 s warm (was 4.3 s); 0.12 s right after a stock update; four at once with the cache warm 0.04-0.12 s; four at once right after an API restart 5.5 s each (was 25.5 s each, because now they share one computation); the Restock page renders its table in 1.6 s. Unit tests 292 passed, 4 skipped; dashboard image 46 passed, 1 skipped
+
+**Found while checking**
+- A slip of mine: a test script read the wrong field and wrote 7 as the local stock of ISO001 (Isotank 500L). It was put back to 4, the value in `data/sample_transactions/products.csv`; the value it had before the slip was not recorded, so the local database may have differed. Only the local demo data was touched
+- `/chat` returns 500 when the answer-phrasing call times out, although the SQL already ran and the rows are known. It could fall back to showing the rows. Not changed
+
+**UNVERIFIED**
+- That this is what happened on the VM: the cause is reasoned from the symptoms and local timing, not read from its log. If the dashboard's own error text said something other than the restock load error, or the API log has a traceback for `/restock`, it is something else
+- The speed on the VM itself; a first request after each API restart is still slow, and a VM with one or two cores may need more than 120 s for it
+
+---
+
+
+## Chat: the result no longer waits for the wording – 2026-10-18
+
+**Report:** `/chat` answered 500 when the last LLM call (putting the rows into words) timed out, although the SQL had run and the rows were known (`openai.APITimeoutError` in `_generate_answer`). Request: show the SQL and the rows first and load the wording after, so nobody waits on the slow call
+
+**What was done**
+- `app/chat/service.py`: the wording is optional. `chat(..., with_answer=False)` stops after the query; `phrase_answer` words rows it is given; any failure of the wording call (timeout, 429, 5xx, an unreadable reply) is logged and gives `None`. The wording call also got one short retry at most (`max_retries=1`, `max_delay=5`), like the restock rephrasing, so it never sleeps through a 60 s `Retry-After`
+- `app/api/chat.py`: `POST /chat` takes `answer` (default true, so existing callers behave as before, minus the 500); new `POST /chat/answer` (question up to 500 characters, up to 50 columns and 200 rows, the cap of the SQL guard). It returns `{"answer": null}` with 200 when the model fails, and 503 only when no LLM is configured
+- `dashboard/api_client.py`: `chat(..., answer=False)` and `chat_answer`, with a 90 s wait for the wording instead of the 300 s of the query call
+- `dashboard/views/ask.py`: the question, the table and the SQL are drawn first; the answer slot above them shows "Writing the summary... The query result is already below." and is filled when it arrives, or says the summary is unavailable. Each entry is fetched once and kept in the session
+- Tests: 15 new ones (service, endpoint and validation; the page's call order, the unavailable cases, no second fetch; the client's calls and timeout) and the route list; 303 passed and 4 skipped locally, 51 passed and 1 skipped in the dashboard image
+
+**Checked live**
+- API: `/chat` with `answer: false` 9.9 s (the SQL model, which is most of a question), `/chat/answer` 5.2 s for its rows ("Jumlah produk yang ada adalah 38."), 422 for 201 rows
+- Page, against a stub API whose wording call takes 12 s: the table and the SQL are on screen 0.4 s after the click, the spinner message appears with them and the answer arrives at 12.2 s. With a stub that answers `null` after 9 s: the page shows the table, the SQL and the note, with no error and no exception
+
+**UNVERIFIED**
+- Not seen against the real model failing: the failure paths are covered by tests and the stub, not by a real Token Factory timeout
+- The page still blocks while the wording is fetched, because Streamlit runs a script top to bottom: the result is visible and readable, but a new question can only be asked after the wording arrives or gives up (90 s at most)
+- The 30 s limit of the wording call was kept; if the shared model is slow it will often give a note instead of text
+
+---

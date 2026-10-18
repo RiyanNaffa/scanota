@@ -12,6 +12,12 @@ _TIMEOUT = 30
 # Calls that wait on the LLM. Worst case for a receipt: OCR 60 s + main vision model 120 s +
 # fallback model 120 s, and a 429 may also sit out a 60 s Retry-After. Usually it takes seconds.
 _LLM_TIMEOUT = 300
+# The forecast is computed per request. It takes seconds on a fast machine and can take much
+# longer on a small VM, most of all on the first request after the API starts.
+_FORECAST_TIMEOUT = 120
+# The written answer is optional: the API gives the model 30 s plus one short retry, so this
+# covers its worst case and a slow model never holds the page for the full LLM timeout.
+_ANSWER_TIMEOUT = 90
 
 
 def _error(e: httpx.HTTPError) -> dict:
@@ -106,15 +112,24 @@ def restock(explain: str | None = None, lang: str = "id") -> list:
     params = {"lang": lang}
     if explain:
         params["explain"] = explain
-    return _get("/restock", params=params, timeout=_LLM_TIMEOUT if explain else _TIMEOUT) or []
+    timeout = _LLM_TIMEOUT if explain else _FORECAST_TIMEOUT
+    return _get("/restock", params=params, timeout=timeout) or []
 
 
 def forecast_series(sku_id: str) -> dict:
-    return _get(f"/restock/{sku_id}/series")
+    return _get(f"/restock/{sku_id}/series", timeout=_FORECAST_TIMEOUT)
 
 
-def chat(question: str, lang: str = "id") -> dict:
-    return _post("/chat", json={"question": question, "lang": lang}, timeout=_LLM_TIMEOUT)
+def chat(question: str, lang: str = "id", answer: bool = True) -> dict:
+    """The SQL and its rows; with answer=False without the written answer, which comes later."""
+    body = {"question": question, "lang": lang, "answer": answer}
+    return _post("/chat", json=body, timeout=_LLM_TIMEOUT)
+
+
+def chat_answer(question: str, columns: list, rows: list, lang: str = "id") -> dict:
+    """{"answer": text or None} for rows that /chat already returned."""
+    body = {"question": question, "columns": columns, "rows": rows, "lang": lang}
+    return _post("/chat/answer", json=body, timeout=_ANSWER_TIMEOUT)
 
 
 def receipt_image(tx_id: int) -> bytes | None:

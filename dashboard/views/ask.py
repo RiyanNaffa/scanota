@@ -17,9 +17,27 @@ state.setdefault("chat_history", [])
 
 
 def _ask(question: str) -> None:
+    """Run the query now; the written answer is fetched below, after the result is on screen."""
+    lang = get_lang()
     with st.spinner(t("ask.spinner")):
-        result = api.chat(question, get_lang())
-    state["chat_history"].append({"question": question, "result": result})
+        result = api.chat(question, lang, answer=False)
+    ok = isinstance(result, dict) and "error" not in result
+    state["chat_history"].append(
+        {
+            "question": question,
+            "lang": lang,
+            "result": result,
+            "answer": None,
+            "answer_state": "pending" if ok else "none",  # pending | done | unavailable | none
+        }
+    )
+
+
+def _show_answer(slot, answer: str | None) -> None:
+    if answer:
+        slot.markdown(answer)
+    else:
+        slot.caption(t("ask.answer_unavailable"))
 
 
 st.caption(t("ask.examples"))
@@ -34,12 +52,19 @@ with st.form("chat_form", clear_on_submit=True):
 if submitted and question.strip():
     _ask(question.strip())
 
+awaiting: list[tuple[dict, object]] = []  # entries whose written answer is still to be fetched
 for entry in reversed(state["chat_history"]):
     result = entry["result"]
     with st.container(border=True):
         st.markdown(f"**{entry['question']}**")
         if isinstance(result, dict) and "error" not in result:
-            st.markdown(result.get("answer") or t("ask.no_answer"))
+            answer_slot = st.container()  # filled last, so the rows and the SQL appear first
+            if entry["answer_state"] == "pending":
+                awaiting.append((entry, answer_slot))
+            elif entry["answer_state"] == "unavailable":
+                _show_answer(answer_slot, None)
+            else:
+                _show_answer(answer_slot, entry["answer"] or t("ask.no_answer"))
             if result.get("rows"):
                 st.dataframe(
                     pd.DataFrame(result["rows"], columns=result.get("columns") or None),
@@ -51,3 +76,16 @@ for entry in reversed(state["chat_history"]):
         else:
             message = result.get("error") if isinstance(result, dict) else str(result)
             st.error(message or t("ask.failed"), icon=ICON["error"])
+
+# The model's wording is the slow part. Everything above is already on screen while it is fetched,
+# and if the model is slow or down the page keeps the table and the SQL instead of failing.
+for entry, slot in awaiting:
+    result = entry["result"]
+    with slot, st.spinner(t("ask.answer_loading")):
+        reply = api.chat_answer(
+            entry["question"], result.get("columns") or [], result.get("rows") or [], entry["lang"]
+        )
+    answer = reply.get("answer") if isinstance(reply, dict) else None
+    entry["answer"] = answer
+    entry["answer_state"] = "done" if answer else "unavailable"
+    _show_answer(slot, answer)

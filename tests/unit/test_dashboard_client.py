@@ -64,3 +64,44 @@ def test_health_refused_connection_is_offline(monkeypatch):
     monkeypatch.setattr(api.httpx, "get", refused)
 
     assert "error" in api.health()
+
+
+def test_the_forecast_calls_wait_longer_than_an_ordinary_call(monkeypatch):
+    """/restock computes the forecast per request; on a small VM that outlasts the 30 s default."""
+    api = _real_api()
+    waits: dict[str, float] = {}
+
+    def fake_get(url, params=None, timeout=None):
+        waits[url] = timeout
+        return httpx.Response(200, json=[], request=_REQUEST)
+
+    monkeypatch.setattr(api.httpx, "get", fake_get)
+    api.restock(lang="id")
+    api.forecast_series("ISO001")
+    api.transactions(limit=1)
+
+    restock_wait, series_wait, other_wait = list(waits.values())
+    assert restock_wait == series_wait == 120
+    assert other_wait == 30
+
+
+def test_chat_can_skip_the_written_answer_and_fetch_it_separately(monkeypatch):
+    api = _real_api()
+    sent: dict[str, dict] = {}
+
+    def fake_post(url, json=None, files=None, data=None, timeout=None):
+        sent[url.rsplit("/chat", 1)[-1] or "/"] = {"json": json, "timeout": timeout}
+        return httpx.Response(200, json={"answer": None}, request=_REQUEST)
+
+    monkeypatch.setattr(api.httpx, "post", fake_post)
+    api.chat("q", "en", answer=False)
+    api.chat_answer("q", ["n"], [[1]], "en")
+
+    assert sent["/"]["json"] == {"question": "q", "lang": "en", "answer": False}
+    assert sent["/answer"]["json"] == {
+        "question": "q",
+        "columns": ["n"],
+        "rows": [[1]],
+        "lang": "en",
+    }
+    assert sent["/answer"]["timeout"] == 90  # not the 300 s of the query call

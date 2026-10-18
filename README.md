@@ -20,7 +20,7 @@ Online invoice / CSV ─► POST /ingest/online ──────────�
 2. **Validate (no LLM).** `sum(qty x price) == total`, date and price-range checks, fuzzy matching of item names to the product master (e.g. "SMN 3R" and "semen tiga roda 50kg" become one SKU). Low-confidence receipts go to a "Needs review" screen; corrections become new aliases.
 3. **Merge.** Online and offline transactions share one canonical schema.
 4. **Act.** Per-SKU demand forecast, safety stock and reorder point produce a weekly restock list with reasons.
-5. **Ask.** A question in Indonesian or English is translated to read-only SQL. The LLM never answers sales numbers from memory.
+5. **Ask.** A question in Indonesian or English is translated to read-only SQL. The LLM never answers sales numbers from memory. The table and the SQL appear as soon as the query has run; the written answer follows, and is left out (with a note) if the model is slow or down.
 
 ## How the forecast is calculated
 
