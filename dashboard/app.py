@@ -1,98 +1,61 @@
-"""dashboard/app.py – Streamlit entry point (Ringkasan / Dashboard)."""
+"""dashboard/app.py – Streamlit entry point: page setup, navigation and the sidebar.
+
+Pages live in dashboard/views/. They are registered with st.navigation (not the pages/ folder) so
+titles and icons can follow the language chosen in the sidebar.
+"""
+
 from __future__ import annotations
 
 import streamlit as st
 
+# set_page_config must be the first Streamlit call
 st.set_page_config(
     page_title="scanota",
-    page_icon="📦",
+    page_icon=":material/receipt_long:",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
-from dashboard.theme import fmt_rupiah, inject_css  # noqa: E402
+import dashboard.api_client as api  # noqa: E402
+from dashboard.i18n import language_switch, t  # noqa: E402
+from dashboard.theme import ICON, inject_css, status_dot  # noqa: E402
 
 inject_css()
 
-import dashboard.api_client as api  # noqa: E402
+pages = [
+    st.Page("views/overview.py", title=t("nav.overview"), icon=ICON["overview"], default=True),
+    st.Page("views/scan.py", title=t("nav.scan"), icon=ICON["scan"], url_path="scan"),
+    st.Page("views/review.py", title=t("nav.review"), icon=ICON["review"], url_path="review"),
+    st.Page("views/restock.py", title=t("nav.restock"), icon=ICON["restock"], url_path="restock"),
+    st.Page("views/ask.py", title=t("nav.ask"), icon=ICON["ask"], url_path="ask"),
+    st.Page(
+        "views/transactions.py",
+        title=t("nav.transactions"),
+        icon=ICON["transactions"],
+        url_path="transactions",
+    ),
+]
+current = st.navigation(pages, position="hidden")
 
-st.sidebar.title("📦 scanota")
-st.sidebar.markdown("---")
-
-# Health indicator
-h = api.health()
-if isinstance(h, dict) and h.get("status") == "ok":
-    st.sidebar.success("API: Online")
-else:
-    st.sidebar.error("API: Tidak terhubung")
-
-st.sidebar.markdown(
-    """
-**Navigasi:**
-- 📊 Ringkasan (halaman ini)
-- 📸 Scan Nota → halaman terpisah
-- ⚠️ Perlu Dicek → halaman terpisah
-- 📦 Restock → halaman terpisah
-- 💬 Tanya Data → halaman terpisah
-- 📋 Transaksi → halaman terpisah
-"""
-)
-
-# ---- Date filters ----
-st.title("📊 Ringkasan")
-col1, col2 = st.columns(2)
-with col1:
-    date_from = st.date_input("Dari tanggal", value=None)
-with col2:
-    date_to = st.date_input("Sampai tanggal", value=None)
-
-data = api.summary(
-    date_from=date_from.isoformat() if date_from else None,
-    date_to=date_to.isoformat() if date_to else None,
-)
-
-if isinstance(data, dict) and "error" not in data:
-    # KPI cards
-    k1, k2, k3, k4 = st.columns(4)
-    k1.metric("Total Penjualan", fmt_rupiah(data.get("total_sales", 0)))
-    k2.metric("Transaksi Online", str(data.get("online_count", 0)))
-    k3.metric("Transaksi Offline", str(data.get("offline_count", 0)))
-    k4.metric("Perlu Dicek", str(data.get("needs_review_count", 0)))
-
-    # Daily sales chart
-    daily = data.get("daily_series", [])
-    if daily:
-        import pandas as pd
-        df = pd.DataFrame(daily)
-        if not df.empty:
-            df["date"] = pd.to_datetime(df["date"])
-            pivot = df.pivot_table(index="date", columns="channel", values="total", fill_value=0)
-            st.subheader("Penjualan Harian per Channel")
-            st.line_chart(pivot)
-
-    # Top products
-    top = data.get("top_products", [])
-    if top:
-        import pandas as pd
-        st.subheader("Produk Terlaris")
-        df_top = pd.DataFrame(top)
-        df_top["revenue"] = df_top["revenue"].apply(fmt_rupiah)
-        st.dataframe(df_top.rename(columns={"name": "Produk", "revenue": "Pendapatan"}), use_container_width=True)
-
-    # Restock top 3
-    restock = api.restock()
-    if isinstance(restock, list) and restock:
-        st.subheader("⚠️ Restock Minggu Ini (Top 3)")
-        for item in restock[:3]:
+with st.sidebar:
+    for i, page in enumerate(pages):
+        with st.container(key=f"nav_{i}"):
+            st.page_link(page, icon=page.icon)
+        if page.title == current.title:  # Streamlit gives the active link no attribute to style
             st.markdown(
-                f'<div class="scanota-card"><b>{item["name"]}</b> — '
-                f'{item.get("reason", "-")}</div>',
+                f"<style>.st-key-nav_{i} [data-testid='stPageLink-NavLink'] {{"
+                "background: rgba(167, 209, 41, 0.14); box-shadow: inset 0 0 0 1px rgba(97, 111, 57, 0.55);"
+                "}</style>",
                 unsafe_allow_html=True,
             )
-else:
-    st.warning(
-        "Tidak dapat memuat data ringkasan. "
-        "Pastikan API berjalan dan data sudah di-seed."
+    st.write("")
+    with st.container(border=True, key="lang_card"):
+        language_switch()
+    health = api.health()
+    online = isinstance(health, dict) and health.get("status") == "ok"
+    st.markdown(
+        status_dot(online, t("sidebar.api_online" if online else "sidebar.api_offline")),
+        unsafe_allow_html=True,
     )
-    if isinstance(data, dict):
-        st.error(data.get("error", "Unknown error"))
+
+current.run()

@@ -1,4 +1,5 @@
 """dashboard/api_client.py – HTTP client for the scanota API."""
+
 from __future__ import annotations
 
 import os
@@ -38,9 +39,7 @@ def _post(
     path: str, json: dict | None = None, files=None, data=None, timeout: float = _TIMEOUT
 ) -> Any:
     try:
-        r = httpx.post(
-            f"{API_BASE_URL}{path}", json=json, files=files, data=data, timeout=timeout
-        )
+        r = httpx.post(f"{API_BASE_URL}{path}", json=json, files=files, data=data, timeout=timeout)
         r.raise_for_status()
         return r.json()
     except httpx.HTTPError as e:
@@ -93,8 +92,8 @@ def update_stock(sku_id: str, current_stock: float) -> dict:
     return _post(f"/products/{sku_id}/stock", json={"current_stock": current_stock})
 
 
-def restock(explain: str | None = None) -> list:
-    params = {}
+def restock(explain: str | None = None, lang: str = "id") -> list:
+    params = {"lang": lang}
     if explain:
         params["explain"] = explain
     return _get("/restock", params=params, timeout=_LLM_TIMEOUT if explain else _TIMEOUT) or []
@@ -104,8 +103,17 @@ def forecast_series(sku_id: str) -> dict:
     return _get(f"/restock/{sku_id}/series")
 
 
-def chat(question: str) -> dict:
-    return _post("/chat", json={"question": question}, timeout=_LLM_TIMEOUT)
+def chat(question: str, lang: str = "id") -> dict:
+    return _post("/chat", json={"question": question, "lang": lang}, timeout=_LLM_TIMEOUT)
+
+
+def receipt_image(tx_id: int) -> bytes | None:
+    """The stored photo of a scanned receipt, or None when there is none."""
+    try:
+        r = httpx.get(f"{API_BASE_URL}/transactions/receipts/{tx_id}/image", timeout=_TIMEOUT)
+    except httpx.HTTPError:
+        return None
+    return r.content if r.status_code == 200 else None
 
 
 def ingest_receipt(file_bytes: bytes, filename: str, content_type: str) -> dict:

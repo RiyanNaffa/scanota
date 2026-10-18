@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 40" width="180" height="40">
+  <path d="M10 4h20a2 2 0 0 1 2 2v28l-4-3-4 3-4-3-4 3-4-3-4 3V6a2 2 0 0 1 2-2z" fill="none" stroke="#a7d129" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M13 13h14M13 19h14M13 25h8" stroke="#616f39" stroke-width="2.4" stroke-linecap="round"/>
+  <text x="46" y="27" font-family="Source Sans Pro, Arial, sans-serif" font-size="22" font-weight="700" fill="#f1f5e4">scan<tspan fill="#a7d129">ota</tspan></text>
+</svg>

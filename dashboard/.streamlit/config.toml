@@ -1,7 +1,14 @@
 [theme]
 base = "dark"
-primaryColor = "#2ECC71"
-backgroundColor = "#0B1210"
-secondaryBackgroundColor = "#111B17"
-textColor = "#E6F2EC"
+primaryColor = "#a7d129"
+backgroundColor = "#000000"
+secondaryBackgroundColor = "#3e432e"
+textColor = "#f1f5e4"
 font = "sans serif"
+
+[client]
+# "viewer" hides the Deploy button and the developer menu entries (the app runs on its own VM)
+toolbarMode = "viewer"
+
+[browser]
+gatherUsageStats = false
