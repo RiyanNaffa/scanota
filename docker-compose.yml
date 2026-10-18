@@ -30,9 +30,11 @@ services:
       timeout: 5s
       retries: 10
       start_period: 10s
-    # Port 5432 is NOT published by default. Set POSTGRES_PORT=5432 in .env to expose it.
+    # Postgres is bound to 127.0.0.1, so it is reachable from this machine only (psql, an SSH
+    # tunnel) and never from the network. The api and dashboard reach it as db:5432 inside the
+    # compose network. POSTGRES_PORT fixes the local port; empty lets Docker pick one.
     ports:
-      - "${POSTGRES_PORT:-}:5432"
+      - "127.0.0.1:${POSTGRES_PORT:-}:5432"
 
   # ----------------------------------------------------------
   # api: FastAPI backend (added in Phase 2)
