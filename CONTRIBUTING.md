@@ -15,8 +15,20 @@ make demo-data           # load synthetic sample data
 Run tests before opening a pull request:
 
 ```bash
-make test                # or: pytest tests/
+make test                # or: pytest tests/unit
 ```
+
+The dashboard view tests need Streamlit, which is not in `app/requirements-dev.txt`, so `make test`
+and CI skip them. Run them in the dashboard image after changing anything in `dashboard/`:
+
+```bash
+docker compose build dashboard
+docker compose run --rm --no-deps --entrypoint "" \
+  -v "$(pwd)/tests:/app/tests:ro" -v "$(pwd)/app:/app/app:ro" dashboard \
+  sh -c "pip install -q pytest && cd /app && python -m pytest tests/unit/test_dashboard_views.py tests/unit/test_dashboard_i18n.py tests/unit/test_dashboard_client.py -q"
+```
+
+`make lint` and CI check `app` and `tests` only; run `ruff check dashboard` and `ruff format dashboard` yourself.
 
 ## Workflow
 
@@ -63,6 +75,7 @@ chore: update docker base image
 | New env variable | `.env.example` and the README |
 | New forecast method or metric | `app/eval/backtest.py` and the README results table |
 | New dashboard text | `dashboard/strings.py` in both languages (a test fails if they differ) |
+| New slow API call in a dashboard page | Wrap it in `st.spinner` with its own `*.loading` message, so the page is never empty while it waits |
 
 ## Pull request checklist
 

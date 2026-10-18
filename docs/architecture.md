@@ -6,7 +6,7 @@
 graph TD
     A[Paper Receipt Photo] -->|POST /ingest/receipt| B[FastAPI Backend]
     C[Online Order JSON/CSV] -->|POST /ingest/online| B
-    B -->|preprocess + vision LLM| D[Extraction]
+    B -->|preprocess + OCR hint + vision LLM| D[Extraction]
     D -->|deterministic rules| E[Validation]
     E --> F[(PostgreSQL)]
     F -->|SQLAlchemy| G[API Routers]
@@ -23,12 +23,12 @@ graph TD
 |---|---|---|
 | Backend | FastAPI + Uvicorn | REST API, business logic |
 | Database | PostgreSQL 16 | Transactions, products, aliases |
-| Extraction | Vision LLM (OpenAI-compat) | Receipt OCR |
+| Extraction | Vision LLM (OpenAI-compat) + OCR endpoint | Receipt reading; the OCR text is a hint, the image stays the source of truth |
 | Preprocessing | OpenCV | Deskew, CLAHE, resize |
 | Validation | Pure Python (rules.py) | Math checks, fuzzy matching |
 | Forecast | statsforecast (Croston/TSB) | Demand forecast |
 | Chat | Text LLM + sqlglot | Read-only text-to-SQL |
-| Dashboard | Streamlit | Indonesian dark-green UI |
+| Dashboard | Streamlit | Indonesian and English dark-green UI |
 | Inference | AMD Token Factory (OpenAI-compatible API) | Vision, text and OCR models |
 
 ## LLM vs Math Boundary
@@ -64,7 +64,11 @@ use it. To switch to your own vLLM, change `LLM_BASE_URL` (and the model names) 
 - Streamlit multipage app: `dashboard/app.py` sets up the page and `st.navigation`; the pages are in `dashboard/views/`. Navigation is `st.navigation(position="hidden")` plus `st.page_link` buttons in the sidebar, rather than the `pages/` folder, so titles and icons follow the chosen language and the sidebar order is ours (brand, pages, language card, API status).
 - **Language:** all text is in `dashboard/strings.py` (Indonesian default, English). The sidebar switch keeps the choice in the session and in `?lang=`. The API gets the language too: `/restock?lang=` returns the reason and shelf-life note in that language and `/chat` answers in it. Validation issues are shown with a translated label plus the engine's English detail. A test checks that both languages have the same keys and placeholders and that every validation issue code has a label.
 - **Scan page:** upload files or use the device camera. The camera widget is created only when "Camera" is selected, so no permission prompt appears for visitors who upload. Both read from the visitor's browser, never from the server's disk. Each image is scanned once (results are kept by image hash), so a rerun caused by anything else cannot re-send a receipt to the model.
-- **Theme:** `dashboard/.streamlit/config.toml` and `dashboard/theme.py`. The sidebar has the same black as the page with a hairline border; containers are border-only (no fill) and only metrics, inputs and the active link have a fill, always padded and rounded. The brand is drawn in the sidebar header with CSS, not `st.logo`, which adds a second copy in the page header that overlaps the sidebar. Palette `#000000`, `#3e432e`, `#616f39`, `#a7d129`, plus amber and red used only to mean "watch" and "act now". No animations; the Deploy button is hidden with `toolbarMode = "viewer"`.
+- **Loading and caching:** no page is ever left empty while it waits. Every call that can be slow runs inside `st.spinner` with its own message (Overview, Restock, Review for the list, the receipt and the confirm, Transactions, Ask and Scan for the model calls), and `app.py` shows "Loading the page..." while it checks the API (2 s at most, then cached for 10 s). `restock_cached` keeps the forecast for a minute (cleared after a stock update, a scan or a confirm). A test checks that each of these messages is wired into its page.
+- **Layout of buttons:** the photo source switch is a two-column grid (equal buttons, full width on a phone, 520 px at most on a desktop). Rows of action buttons sit in a container whose key starts with `actions_`; the CSS in `theme.py` gives each button a readable width and lets the row wrap instead of squeezing the buttons, because Streamlit only stacks columns below 640 px.
+- **Upload limit:** 10 MB per photo, set in three places that a test keeps equal: `server.maxUploadSize` in `dashboard/.streamlit/config.toml`, `MAX_UPLOAD_MB` in the API settings and `MAX_UPLOAD_MB` in `dashboard/helpers.py`. The reverse proxy allows 12 MB.
+- **Toolbar:** `toolbarMode = "minimal"` hides the three-dot menu (Rerun, Settings, Print, Record a screencast, About) as well as the Deploy button.
+- **Theme:** `dashboard/.streamlit/config.toml` and `dashboard/theme.py`. The sidebar has the same black as the page with a hairline border; containers are border-only (no fill) and only metrics, inputs and the active link have a fill, always padded and rounded. The brand is drawn in the sidebar header with CSS, not `st.logo`, which adds a second copy in the page header that overlaps the sidebar. Palette `#000000`, `#3e432e`, `#616f39`, `#a7d129`, plus amber and red used only to mean "watch" and "act now". No animations.
 
 ## Forecast Policy
 
@@ -83,7 +87,7 @@ use it. To switch to your own vLLM, change `LLM_BASE_URL` (and the model names) 
   (`app/llm.py`); a `Retry-After` header wins over the backoff. Tokenfactory answers its
   per-minute limits with `Retry-After: 60`, so `LLM_RETRY_MAX_SECONDS` must stay above 60.
   Timeouts are not retried. The optional restock rephrasing gives up at the first long 429
-  instead of waiting. The dashboard's LLM-backed calls have a 150 s timeout to fit the waits.
+  instead of waiting. The dashboard's LLM-backed calls have a 300 s timeout to fit the waits.
 - **Vision fallback:** if `LLM_MODEL_VISION` stays down (5xx after retries, or a timeout), the
   receipt is read by `LLM_MODEL_VISION_FALLBACK` instead (empty = off). 429s and connection
   errors do not switch models. The switch lasts for that receipt only; the next one tries the

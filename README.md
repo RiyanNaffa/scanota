@@ -20,7 +20,7 @@ Online invoice / CSV ─► POST /ingest/online ──────────�
 2. **Validate (no LLM).** `sum(qty x price) == total`, date and price-range checks, fuzzy matching of item names to the product master (e.g. "SMN 3R" and "semen tiga roda 50kg" become one SKU). Low-confidence receipts go to a "Needs review" screen; corrections become new aliases.
 3. **Merge.** Online and offline transactions share one canonical schema.
 4. **Act.** Per-SKU demand forecast, safety stock and reorder point produce a weekly restock list with reasons.
-5. **Ask.** Chat in Indonesian is translated to read-only SQL. The LLM never answers sales numbers from memory.
+5. **Ask.** A question in Indonesian or English is translated to read-only SQL. The LLM never answers sales numbers from memory.
 
 ## How the forecast is calculated
 
@@ -62,21 +62,51 @@ Requirements: Docker and Docker Compose.
 ```bash
 git clone https://github.com/RiyanNaffa/scanota.git
 cd scanota
-cp .env.example .env        # fill in LLM_BASE_URL, LLM_API_KEY, LLM_MODEL
+cp .env.example .env        # fill in LLM_BASE_URL and LLM_API_KEY (the model names have defaults)
 make up                     # or: docker compose up --build
-make demo-data              # loads sample receipts and online orders
+make demo-data              # loads the synthetic demo data (see Demo data below)
 ```
 
 Open the dashboard at http://localhost:8501. The language (Indonesian or English) is switched in the sidebar, and receipts can be uploaded from files or captured with the device camera on the Scan Receipt page.
 
 Never commit `.env`. All keys are read from environment variables.
 
+## Demo data
+
+The demo, including a deployment, runs on **synthetic data**. Nothing in it is a real customer or a real sale. The database starts empty, so load it once after the first start:
+
+```bash
+make demo-data
+```
+
+Where `make` is not installed (a fresh VM, for example) run what it runs: `docker compose exec api python -m app.db.seed`. It needs the stack to be up, and it reads `./data`, which `docker-compose.yml` mounts into the API container. It is safe to run again: orders that already exist are skipped.
+
+| What | Where | How it gets in |
+|---|---|---|
+| 38 products with their aliases, 510 online orders and 3,034 offline sales over about 78 weeks, stored as confirmed transactions | `data/sample_transactions/` | `make demo-data` |
+| 40 sample receipt photos with their ground truth (five have a deliberately wrong total) | `data/sample_receipts/` | Not loaded: scan them on the Scan Receipt page. Uploads come from the visitor's device, so download the images from the repository to it first |
+
+With this data every product starts well above its reorder point, so the Restock page shows no order to place. Lower a stock level there to see one.
+
 ## Deploying on a VM
 
 - **HTTPS is required for the camera.** Browsers only allow camera access on HTTPS or on `localhost`. Over plain `http://<vm-ip>:8501` the Camera option cannot work, so put a reverse proxy with a TLS certificate (Caddy or nginx) in front of the dashboard.
 - **Uploads and photos come from the visitor's device.** The file picker and the camera run in the visitor's browser and send the image to the server. Nothing is read from the VM's file system. Scanned receipts are stored in the `storage` Docker volume.
-- **Expose only the proxy.** `docker-compose.yml` publishes the API (8000) and the dashboard (8501) on the host; open only 443 in the firewall or network security group. Postgres is not published unless `POSTGRES_PORT` is set.
-- **There is no login.** Anyone who can open the dashboard can read sales data, confirm receipts and ask questions. Add authentication at the proxy before exposing it.
+- **Expose only the proxy.** `docker-compose.yml` publishes the API (8000) and the dashboard (8501) on the host; open only 443 in the firewall or network security group. Postgres is bound to `127.0.0.1` in `docker-compose.yml`, so it is never reachable from the network; the API and the dashboard reach it as `db:5432` inside the compose network. For `psql` on the VM or over an SSH tunnel, set `POSTGRES_PORT` in `.env` to fix its local port (empty lets Docker pick one; `docker compose ps` shows it).
+- **Receipt photos are limited to 10 MB each.** The dashboard (`server.maxUploadSize` in `dashboard/.streamlit/config.toml`) and the API (`MAX_UPLOAD_MB`) enforce 10 MB, and a test checks the two agree. Set the proxy limit a little higher, 12 MB, so a 10 MB photo is not cut off by the proxy before the dashboard can answer with its own message.
+- **There is no login in the app.** Anyone who can open the dashboard can read sales data, confirm receipts and ask questions, so add authentication at the proxy. A minimal Caddyfile with TLS, a password and the size limit (make the hash with `caddy hash-password`):
+
+```
+scanota.example.com {
+	basic_auth {
+		admin <hash>
+	}
+	request_body {
+		max_size 12MB
+	}
+	reverse_proxy localhost:8501
+}
+```
 
 ## Runs on AMD
 
@@ -91,7 +121,7 @@ app/         FastAPI backend (ingest, extraction, validation, forecast, chat) an
 dashboard/   Streamlit UI: pages in views/, Indonesian and English text in strings.py
 infra/amd/   Optional vLLM ROCm self-hosting overlay (not used by default)
 data/        Synthetic sample receipts and transactions
-tests/       Validation, matching, forecast tests
+tests/       Unit tests (validation, matching, forecast, SQL guard, LLM retry, OCR, dashboard) and a health check
 docs/        Architecture and build log
 ```
 

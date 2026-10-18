@@ -1,10 +1,10 @@
 # infra/amd – self-hosted vLLM on AMD ROCm
 
-**This folder is only for self-hosting.** During development scanota talks to the AMD Tokenfactory
-API and needs nothing from here: set `LLM_BASE_URL` and `LLM_API_KEY` in `.env` and run
-`make up`. Do not start the vLLM compose file for Tokenfactory.
+**This folder is only for self-hosting.** scanota uses the AMD Token Factory API (the current
+setup) and needs nothing from here: set `LLM_BASE_URL` and `LLM_API_KEY` in `.env` and run
+`make up`. Do not start the vLLM compose file for Token Factory.
 
-| | AMD Tokenfactory (development) | Self-hosted vLLM (final demo) |
+| | AMD Token Factory (current) | Self-hosted vLLM (optional) |
 |---|---|---|
 | Who runs the model | AMD, as a hosted API | You, on an AMD GPU (Developer Cloud / Instinct) |
 | `LLM_BASE_URL` | `https://developer.amd.com.cn/radeon/api/v1` | `http://<vllm-host>:8080/v1` |

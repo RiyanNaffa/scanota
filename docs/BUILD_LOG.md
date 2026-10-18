@@ -361,3 +361,66 @@
 **Checked** in the browser pane with screenshots this time (sidebar open and collapsed, hover on the header) and a DOM audit that lists every filled element with its corner radius: no square fills remain apart from the inner field of the date inputs, which sits inside a rounded box
 
 ---
+
+
+## Dashboard: menu, upload limit, loading, demo data, language switch – 2026-10-18
+
+**What was done**
+- The three-dot menu (Rerun, Settings, Print, Record a screencast, About) is gone: `toolbarMode = "minimal"` (it was "viewer", which still shows it). The element is absent from the page
+- 10 MB per photo: `server.maxUploadSize = 10` (the uploader now says "Limit 10MB per file"), `MAX_UPLOAD_MB` in the API settings and `.env.example`, a note under the uploader, and a test that the dashboard config, the dashboard constant and the API setting agree. The Caddy limit is 12 MB so a 10 MB photo plus the multipart envelope is not cut off before the dashboard can answer
+- Loading feedback: the Restock and Overview pages show a spinner with a message while the forecast runs (it takes 5-10 s). Cause of the blank page: the sidebar waited for the API health check before the page started, and the page itself showed nothing until the forecast returned. The health check is now bounded (2 s, kept for 10 s). `restock_cached` keeps the forecast for a minute, cleared after a stock update, a scan or a confirm (a stock update now also reloads the page, so the table shows the new stock)
+- README: a "Demo data" section (the deployment runs on synthetic data; `make demo-data`, or `docker compose exec api python -m app.db.seed` where make is missing; what is loaded and what is not; safe to run twice) and the Caddy example with basic auth and the 12 MB limit. The old line "loads sample receipts and online orders" was wrong: the seed loads products, online orders and offline sales, while the receipt photos are for scanning
+- Language switch: on a phone the flags sat above full-width buttons (Streamlit stacks columns below 640 px) and on desktop the flags sat low. Now two equal buttons forced into one row, with the flag drawn inside each button, so it is centred with the label. A segmented control was tried first and dropped: its button sizes are locked by Streamlit's generated classes
+
+**Found while checking**
+- The `api` and `db` containers had exited (code 0) about 13 minutes before: the dashboard then showed "API tidak terhubung". Started again with `docker compose up -d db api`; the data was intact (38 products, 3,546 transactions)
+
+**Checked** in the browser pane: menu absent, "Limit 10MB per file" in the uploader, the spinner on Restock, the language card on desktop (two 110 px buttons, 8 px apart, flag and label centred) and at 375 px (same row, 92 px each). The sidebar would not open in the emulated phone view, so that last check forced it open with CSS
+
+**UNVERIFIED**
+- A 10 MB+ upload was not tried through Caddy; the limit is checked by configuration and tests, not by an upload
+- `st.cache_data` is per server process: with several Streamlit workers each keeps its own copy for a minute
+
+---
+
+
+## Dashboard: loading on every page, scan buttons – 2026-10-18
+
+**What was done**
+- Loading: no page is empty while it waits any more. `st.spinner` with a message now wraps the Review list, the receipt and the confirm call, and the Transactions list (Overview, Restock, Ask and the scan itself already had one). `app.py` shows "Memuat halaman..." while it checks the API, which covers the pages that load nothing themselves (Scan, Ask). A test lists every message and checks it is wired into its page
+- Photo source switch ("Unggah berkas" / "Kamera"): the two buttons were as wide as their content, anchored left and uneven (137 and 95 px), with the icon touching the label. Streamlit gives the group `max-width: fit-content` and its flex children stayed icon-wide, so the group is a two-column grid now: equal buttons, 10 px between icon and label, full width on a phone, 520 px at most on a desktop. The label also sat 8 px below the icon, because its markdown container has a -1rem bottom margin; that is reset
+- "Scan N nota" and "Mulai ulang": they were the first two of `st.columns([2, 2, 5])`, so they shrank with the window (about 100 px at an 830 px window with the menu open) until Streamlit stacked them at 640 px. They now sit in an `actions_*` container: 220 px each, never narrower than 190 px, wrapping onto a second line when the row is too narrow, full width on a phone. The Review page's "Konfirmasi tanpa perubahan" and "Lewati" row had the same problem and uses the same container, with a wider first button because that label is longer than 220 px
+
+**Checked** in the browser pane with the API container paused: the "Memuat riwayat transaksi...", "Memuat nota yang perlu dicek..." and "Loading the page..." messages appear under the title while the API does not answer. Layout measured at 1100 and 760 px (two 256 px source buttons, two 220 px action buttons), 830 px with the menu open (227 px and 220 px) and 375 px (two 165 px source buttons 8 px apart, full-width stacked actions); icon, label and button centres are on the same line
+
+**Found while checking**
+- The first visit to a deep link (for example `/scan`) after the dashboard container starts shows Streamlit's "Page not found ... Running the app's main page" dialog, while the right page is rendered behind it; a second load is clean. Seen twice, right after a restart. It looks like Streamlit not knowing the `st.navigation` paths until one session has run, so it only affects the first visitor after a restart. Not changed
+
+**UNVERIFIED**
+- The Review page could not be seen with data: the demo data has no receipt waiting for review, so its spinners were checked by the test that wires them in and its button row only by the CSS rule, not on screen
+- The `actions_*` wrap was checked down to a main column of about 430 px; a window narrower than that with the menu open was not tried
+
+---
+
+
+## Documentation review – 2026-10-18
+
+Every Markdown file was read against the code, the compose file, the Makefile, CI and the running stack. This log is append-only, so the old entries that are no longer true (Phase 1 "Port 5432 not published by default", Phase 9 Evolus) are left as history and corrected here.
+
+**Changed**
+- `README.md`: the setup line named `LLM_MODEL`, which no longer exists (the names are `LLM_MODEL_VISION` and `LLM_MODEL_TEXT`, with defaults); the chat is described as Indonesian or English; the test row of the layout lists what is tested now; the "Postgres is not published" claim is replaced by what the compose file now does (see below)
+- `docs/architecture.md`: the diagram and component table show the OCR hint; the dashboard is Indonesian and English; the dashboard's LLM timeout is 300 s (it said 150 s); a leftover sentence said the Deploy button is hidden with `toolbarMode = "viewer"` while the file says `"minimal"`
+- `infra/amd/README.md`, `.env.example`: still called Token Factory "development" and a self-hosted vLLM the "final demo"; it is the current setup and the vLLM overlay is optional
+- `CONTRIBUTING.md`: how to run the dashboard tests (below), that lint covers `app` and `tests` only, and a row for the loading message of a new slow call
+- `SECURITY.md`: the dashboard has no login of its own
+
+**Found while checking**
+- `docker-compose.yml` has `ports: "${POSTGRES_PORT:-}:5432"` for `db`. With the variable empty Docker publishes Postgres on a random host port on all interfaces (it showed as `0.0.0.0:56948->5432`), so the README claim that it is not published was wrong. Fixed: the mapping is now `127.0.0.1:${POSTGRES_PORT:-}:5432`, so Postgres is reachable from the machine only (checked: `docker compose ps` shows `127.0.0.1:51208->5432` and the API still answers, with the data intact). `POSTGRES_PORT` now fixes the local port instead of exposing it; the README and `.env.example` say so. The API (8000) and the dashboard (8501) are still published on all interfaces, as the README says
+- The dashboard view tests are skipped by `make test` and by CI, because Streamlit is not in `app/requirements-dev.txt`; they only run in the dashboard image. CI also lints `app` and `tests` but not `dashboard`
+- An empty directory `tests;C` had been created in the repository root by a Docker mount whose Windows path was cut at the colon. Removed
+- `CONTRIBUTING.md` says not to push to `main` directly, while the work so far went straight to `main`
+
+**UNVERIFIED**
+- The `$(pwd)` form of the dashboard test command in `CONTRIBUTING.md` was not run; the run used the same command with explicit Windows paths and `MSYS_NO_PATHCONV=1`
+
+---
