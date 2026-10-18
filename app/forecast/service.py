@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import hashlib
 import logging
+import threading
 from typing import Any
 
 from sqlalchemy.orm import Session
@@ -32,6 +34,37 @@ _DATA_QUALITY = {
     "short_history": "insufficient_history",
     "no_data": "insufficient_history",
 }
+
+
+# The demand model is the slow part of /restock (about 0.1 s per SKU, 4 s for 38 SKUs on a fast
+# machine, much more on a small VM) and it depends only on a SKU's weekly sales, not on its stock.
+# So it is remembered by a fingerprint of the series: a stock update, a second user or a second
+# page asking at once reuse it, and a new sale only recomputes the SKUs whose series changed. The
+# lock makes concurrent requests wait for one computation instead of running several at once,
+# which on a few cores made four simultaneous requests take 6x as long as one.
+_FORECAST_CACHE: dict[tuple, dict[str, Any]] = {}
+_FORECAST_CACHE_MAX = 512
+_FORECAST_LOCK = threading.Lock()
+
+
+def _series_key(series: Any, horizon: int) -> tuple:
+    digest = hashlib.blake2b(series.values.astype("float64").tobytes(), digest_size=16)
+    return (str(series.index[0]), len(series), digest.hexdigest(), horizon)
+
+
+def cached_forecast(series: Any, horizon: int) -> dict[str, Any]:
+    """forecast_sku(series, horizon), remembered while the series stays the same."""
+    key = _series_key(series, horizon)
+    with _FORECAST_LOCK:
+        result = _FORECAST_CACHE.get(key)
+        if result is None:
+            result = forecast_sku(series, horizon=horizon)
+            # A failed model run is not remembered: the next request should try again
+            if result.get("fallback_reason") != "error":
+                if len(_FORECAST_CACHE) >= _FORECAST_CACHE_MAX:
+                    _FORECAST_CACHE.pop(next(iter(_FORECAST_CACHE)))
+                _FORECAST_CACHE[key] = result
+    return {**result, "forecast": list(result["forecast"])}  # callers may edit their copy
 
 
 def data_quality_label(fc_result: dict[str, Any]) -> str:
@@ -95,7 +128,7 @@ def build_restock_list(db: Session, lang: str = "id") -> list[dict[str, Any]]:
 
         series = series_map.get(sku_id)
         if series is not None:
-            fc_result = forecast_sku(series, horizon=2)
+            fc_result = cached_forecast(series, horizon=2)
         else:
             fc_result = {
                 "forecast": [0.0, 0.0],
@@ -169,7 +202,7 @@ def get_forecast_series(db: Session, sku_id: str) -> dict[str, Any] | None:
     if series is None:
         return None
 
-    fc_result = forecast_sku(series, horizon=4)
+    fc_result = cached_forecast(series, horizon=4)
     sigma = fc_result["sigma"]
 
     history = [
