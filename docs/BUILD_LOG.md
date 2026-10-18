@@ -312,3 +312,52 @@
 - Synthetic data, so the stockout rates check the method rather than a real shop
 
 ---
+
+
+## Dashboard redesign, i18n, camera, Evolus removed, OCR evaluation – 2026-10-18
+
+**What was done**
+- Evolus removed: `app/evolus/`, `evolus/`, `app/api/evolus.py`, its settings and `.env.example` block, doc rows, `.gitignore` lines. The local `.env` lost its `EVOLUS_*` lines
+- `app/main.py`: the routers are imported without `try/except ImportError: pass`, so a broken router stops startup instead of disappearing behind a healthy `/health`. `tests/unit/test_app_routes.py` checks every endpoint is mounted and that a broken import raises
+- Chat retry: the rejected SQL is sent back as the assistant turn (it was an empty message, so the model could not see its mistake); when nothing usable came back, no empty assistant turn is sent. `/chat` takes `lang` (id or en) for the answer language
+- Shelf lives checked against sources (see `app/forecast/category_policy.py`): cement 90 d (EUROSAC: typically 2-3 months in bags), mortar and tile adhesive 180 d (INSEE and Cement Australia data sheets: 6 months), paint 365 d (PPG about 2 years, Sherwin-Williams about 1 year for some lines: the shorter), waterproofing 365 d (Sika data sheets: 12 months). The values did not change; they now have sources. No Indonesian data sheet was found for cement or paint
+- Dashboard rebuilt: `st.navigation` with pages in `dashboard/views/`, Material icons instead of emoji, palette `#000000 / #3e432e / #616f39 / #a7d129` (amber and red only for watch / act now), no animations, `toolbarMode = "viewer"` so there is no Deploy button. The restock page now shows the action, the shelf-life risk and a per-product detail with a sales and forecast chart; the receipt photo on the Needs Review page was requested from the wrong path (`/receipts/..`, the API serves `/transactions/receipts/..`) and never showed, now fixed
+- Language switch in the sidebar (flag + ID / EN, flags are inline SVG because Windows browsers draw flag emoji as letters). All text is in `dashboard/strings.py`; `/restock?lang=` returns the reason and shelf-life note in that language. A test checks both languages have the same keys and placeholders and that every validation issue code has a label
+- Scan page: upload files or camera. A rerun used to send every uploaded receipt to the model again (and create a duplicate transaction); each image is now scanned once, by hash. The camera widget is created only after choosing "Camera", because Streamlit tabs render all tabs and the browser asked for camera permission on page load
+- `app/eval/ocr_eval.py` (`make eval`): scores the 40 sample receipts through the production steps, with and without the OCR hint (README table). 3 receipts are read at once; failed reads are retried
+- `tests/unit/test_dashboard_views.py` renders every page in both languages with a fake API (needs Streamlit, so it skips in the API's CI install and runs in the dashboard image)
+
+**OCR evaluation results** (40 synthetic single-item receipts, MiniCPM-V-4.7-35B-A3B)
+
+| | with OCR hint | vision only |
+|---|---|---|
+| date, total correct | 100% | 100% |
+| item F1 (name + qty + line total) | 0.975 | 0.875 |
+| right SKU | 100% | 100% |
+| wrong printed totals caught | 5 of 5 | 5 of 5 |
+| correct receipts flagged | 0 of 35 | 0 of 35 |
+
+- The OCR hint fixed four misread names; the SKU match was 100% either way (fuzzy matching). One receipt (60x120 read as 50x120) is wrong in both
+- The first full run was killed halfway: `docker compose up --build dashboard` also rebuilt and recreated `api`, its dependency, and the evaluation was running inside it. Use `--no-deps` for dashboard-only rebuilds. The second run had 5 vision-only calls fail on timeouts and rate limits (the team key is shared); they were re-run and `ocr_eval` now retries failed receipts itself
+
+**UNVERIFIED / open**
+- The new look was checked through the DOM (colours, no Deploy button, icons, flags, language switch, camera mode) but not by eye: the browser pane could not take screenshots while the Claude window was minimized
+- The camera cannot be tried from here (blocked in the browser pane). On a VM it needs HTTPS; README has a deployment section
+- The Needs Review page can only confirm a receipt as it is. It cannot assign a SKU to an unmatched item, so the "corrections become aliases" loop is incomplete
+- The API has no authentication and CORS is `*`
+
+---
+
+
+## Dashboard layout fixes – 2026-10-18
+
+**Reported and fixed**
+- The logo overlapped the sidebar toggle: `st.logo` adds a second copy of the image in the page header, which sits on top of the sidebar header when the sidebar is open. The brand is now drawn in the sidebar header with CSS (`::before`, left of the collapse button), and navigation is `st.navigation(position="hidden")` plus `st.page_link` buttons so the order is ours
+- Square dark-olive patches (`#191b12` is the card colour at 40% opacity): the card rule was applied to every `stVerticalBlockBorderWrapper`, which Streamlit puts around every block, including the whole page area and the language row. Containers are now border-only (hairline, rounded); only metrics, inputs and the active link have a fill, all padded and rounded. The sidebar is the same black as the page, with a hairline border
+- The language card now sits in a bordered, padded, rounded container on the sidebar's own background, and the API status has 20 px of room above it
+- Also: icons in the sidebar links (`st.page_link` does not take the page icon by itself), the active page is marked in the palette, Streamlit's blue/green/yellow alerts are restyled in the palette, long metric values wrap instead of being cut with an ellipsis, a missing shelf life is a dash instead of the word None
+- Docs: `docs/amd-proof.md` is no longer promised (the project uses AMD Token Factory, which is hosted; there is no AMD machine to take `rocm-smi` or vLLM logs from). README, architecture and the contributing guide now describe Token Factory as the setup and `infra/amd/` as an optional overlay that is not used
+
+**Checked** in the browser pane with screenshots this time (sidebar open and collapsed, hover on the header) and a DOM audit that lists every filled element with its corner radius: no square fills remain apart from the inner field of the date inputs, which sits inside a rounded box
+
+---

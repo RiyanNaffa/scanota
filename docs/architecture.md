@@ -29,7 +29,7 @@ graph TD
 | Forecast | statsforecast (Croston/TSB) | Demand forecast |
 | Chat | Text LLM + sqlglot | Read-only text-to-SQL |
 | Dashboard | Streamlit | Indonesian dark-green UI |
-| Infra | vLLM on AMD ROCm | GPU inference |
+| Inference | AMD Token Factory (OpenAI-compatible API) | Vision, text and OCR models |
 
 ## LLM vs Math Boundary
 
@@ -47,17 +47,24 @@ graph TD
 ## AMD Deployment
 
 ```
-AMD Developer Cloud / Instinct GPU
-  └── vLLM (ROCm) serving vision + text models
-        ↑ OpenAI-compatible HTTP API
-scanota backend (LLM_BASE_URL points to vLLM)
+AMD Token Factory (AMD Radeon Cloud, AMD GPUs)
+  ├── vision model (MiniCPM-V-4.7-35B-A3B, optional fallback DeepSeek-V4.1-Flash)
+  ├── text model (Qwen3.8-27B)
+  └── OCR model (MinerU2.5-Pro, POST /ocr)
+        ↑ OpenAI-compatible HTTP API (LLM_BASE_URL, LLM_API_KEY)
+scanota backend
 ```
 
-The diagram above is the self-hosted setup (`infra/amd/`, final demo). During development the
-backend calls the AMD Tokenfactory API instead and no vLLM container runs.
+`infra/amd/` holds an optional vLLM-on-ROCm overlay for self-hosting. The current setup does not
+use it. To switch to your own vLLM, change `LLM_BASE_URL` (and the model names) in `.env` and set
+`OCR_ENABLED=false`, because vLLM has no `/ocr` route. See `infra/amd/README.md`.
 
-Switch from Tokenfactory to own vLLM: change `LLM_BASE_URL` (and the model names) in `.env`, and
-set `OCR_ENABLED=false` because vLLM has no `/ocr` route. See `infra/amd/README.md`.
+## Dashboard
+
+- Streamlit multipage app: `dashboard/app.py` sets up the page and `st.navigation`; the pages are in `dashboard/views/`. Navigation is `st.navigation(position="hidden")` plus `st.page_link` buttons in the sidebar, rather than the `pages/` folder, so titles and icons follow the chosen language and the sidebar order is ours (brand, pages, language card, API status).
+- **Language:** all text is in `dashboard/strings.py` (Indonesian default, English). The sidebar switch keeps the choice in the session and in `?lang=`. The API gets the language too: `/restock?lang=` returns the reason and shelf-life note in that language and `/chat` answers in it. Validation issues are shown with a translated label plus the engine's English detail. A test checks that both languages have the same keys and placeholders and that every validation issue code has a label.
+- **Scan page:** upload files or use the device camera. The camera widget is created only when "Camera" is selected, so no permission prompt appears for visitors who upload. Both read from the visitor's browser, never from the server's disk. Each image is scanned once (results are kept by image hash), so a rerun caused by anything else cannot re-send a receipt to the model.
+- **Theme:** `dashboard/.streamlit/config.toml` and `dashboard/theme.py`. The sidebar has the same black as the page with a hairline border; containers are border-only (no fill) and only metrics, inputs and the active link have a fill, always padded and rounded. The brand is drawn in the sidebar header with CSS, not `st.logo`, which adds a second copy in the page header that overlaps the sidebar. Palette `#000000`, `#3e432e`, `#616f39`, `#a7d129`, plus amber and red used only to mean "watch" and "act now". No animations; the Deploy button is hidden with `toolbarMode = "viewer"`.
 
 ## Forecast Policy
 

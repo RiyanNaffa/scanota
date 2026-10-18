@@ -62,8 +62,6 @@ chore: update docker base image
 |---|---|
 | New env variable | `.env.example` and the README |
 | New forecast method or metric | `notebooks/` backtest and the README results table |
-| New model or endpoint | `docs/amd-proof.md` if it runs on AMD |
-| Evolus building block | `evolus/` documentation |
 
 ## Pull request checklist
 

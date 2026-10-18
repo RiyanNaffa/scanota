@@ -61,9 +61,8 @@ chore: update docker base image
 | Change | Also update |
 |---|---|
 | New env variable | `.env.example` and the README |
-| New forecast method or metric | `notebooks/` backtest and the README results table |
-| New model or endpoint | `docs/amd-proof.md` if it runs on AMD |
-| Evolus building block | `evolus/` documentation |
+| New forecast method or metric | `app/eval/backtest.py` and the README results table |
+| New dashboard text | `dashboard/strings.py` in both languages (a test fails if they differ) |
 
 ## Pull request checklist
 

@@ -43,5 +43,5 @@ OCR_ENABLED=false
 If your vLLM version rejects `reasoning_effort`, set `LLM_REASONING_EFFORT_SQL=` and
 `LLM_REASONING_EFFORT_TEXT=` to empty; `LLM_MAX_TOKENS_*` still bounds the output.
 
-Not verified on AMD hardware yet: the ROCm image tag and the actual GPU run. Collect `rocm-smi`
-output and vLLM logs in `docs/amd-proof.md` once it runs.
+This overlay has never been run: the ROCm image tag and the GPU run are untested. The project
+currently uses AMD Token Factory instead (see the main README).
