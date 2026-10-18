@@ -424,3 +424,18 @@ Every Markdown file was read against the code, the compose file, the Makefile, C
 - The `$(pwd)` form of the dashboard test command in `CONTRIBUTING.md` was not run; the run used the same command with explicit Windows paths and `MSYS_NO_PATHCONV=1`
 
 ---
+
+
+## API and dashboard bound to 127.0.0.1 – 2026-10-18
+
+**What was done**
+- `docker-compose.yml`: the API and the dashboard are published as `127.0.0.1:8000:8000` and `127.0.0.1:8501:8501`, like Postgres, so only a reverse proxy on the VM (or an SSH tunnel) reaches them. Before, `8000:8000` and `8501:8501` listened on every interface, and the README only asked for a closed firewall
+- README: "Only the proxy faces the network" replaces "Expose only the proxy": what is bound where, the SSH tunnel for use without the proxy, and that a proxy in a container must join the compose network and use `dashboard:8501`. The camera note no longer names `http://<vm-ip>:8501`, which is no longer reachable
+
+**Checked** after recreating the two containers: `docker compose ps` shows `127.0.0.1:8000`, `127.0.0.1:8501` and `127.0.0.1:51208` (db); `/health` answers on `127.0.0.1`, the dashboard answers on `localhost`, and its Overview page loads with the API status "API terhubung", so the dashboard still reaches the API as `api:8000` inside the network. A request to this machine's `172.31.192.1` address on both ports got no answer, but that is a virtual adapter, not necessarily the LAN address, so the binding shown by `docker compose ps` is the real evidence
+
+**UNVERIFIED**
+- Not tried from another machine, and not with Caddy on the VM: the Caddyfile in the README still points at `localhost:8501`, which a loopback binding serves, but that was reasoned, not run
+- `localhost` in a browser can resolve to `[::1]`; the dashboard answered on `localhost` here (Docker Desktop on Windows), and a Linux VM was not tried
+
+---

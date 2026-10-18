@@ -53,8 +53,9 @@ services:
       - storage:/srv/storage
       # Sample data for `make demo-data` (python -m app.db.seed reads data/ relative to /srv/app)
       - ./data:/srv/app/data:ro
+    # Bound to 127.0.0.1: only a reverse proxy on this machine (or you, over an SSH tunnel) can reach it.
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     depends_on:
       db:
         condition: service_healthy
@@ -70,7 +71,8 @@ services:
     env_file: .env
     environment:
       API_BASE_URL: http://api:8000
+    # Bound to 127.0.0.1, like the api: put a reverse proxy with HTTPS in front (see README).
     ports:
-      - "8501:8501"
+      - "127.0.0.1:8501:8501"
     depends_on:
       - api
