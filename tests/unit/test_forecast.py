@@ -185,3 +185,41 @@ class TestCapOrderForShelfLife:
 
     def test_never_negative_when_stock_already_exceeds_the_sellable_amount(self):
         assert cap_order_for_shelf_life(50, 200, 7, 90) == 0
+
+
+class TestRestockTextLanguage:
+    def test_reason_in_indonesian_by_default(self):
+        from app.forecast.policy import restock_reason
+
+        text = restock_reason("Semen", 50, "sak", 7.0, 49.0, 3)
+        assert (
+            text
+            == "Stok 50 sak, perkiraan laku 7.0 sak/minggu, habis sekitar 49 hari. Lead time 3 hari."
+        )
+
+    def test_reason_in_english(self):
+        from app.forecast.policy import restock_reason
+
+        text = restock_reason("Semen", 50, "sak", 7.0, 49.0, 3, lang="en")
+        assert (
+            text
+            == "Stock 50 sak, expected to sell 7.0 sak/week, runs out in about 49 days. Lead time 3 days."
+        )
+
+    def test_reason_with_no_demand_in_both_languages(self):
+        from app.forecast.policy import restock_reason
+
+        inf = float("inf")
+        assert "tidak terhitung" in restock_reason("x", 5, "pcs", 0.0, inf, 2)
+        assert "not computable" in restock_reason("x", 5, "pcs", 0.0, inf, 2, lang="en")
+
+    def test_shelf_life_note_in_english(self):
+        from app.forecast.service import shelf_life_note
+
+        high = shelf_life_note("high", 120.0, 90, "en")
+        assert high == (
+            "Stock covers about 120 days, longer than the 90-day shelf life: expiry risk. "
+            "Hold purchases and sell the old stock first."
+        )
+        assert "never sells" in shelf_life_note("high", float("inf"), 90, "en")
+        assert "close to the 90-day shelf life" in shelf_life_note("watch", 70.0, 90, "en")

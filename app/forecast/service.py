@@ -38,15 +38,26 @@ def data_quality_label(fc_result: dict[str, Any]) -> str:
     return _DATA_QUALITY.get(fc_result.get("fallback_reason"), "model_unavailable")
 
 
-def shelf_life_note(risk: str | None, days_out: float, shelf_days: int | None) -> str | None:
-    """Indonesian warning for the dashboard. Based on days of cover, not on batch ages."""
+def shelf_life_note(
+    risk: str | None, days_out: float, shelf_days: int | None, lang: str = "id"
+) -> str | None:
+    """Warning for the dashboard, in Indonesian or English. Based on days of cover, not batch ages."""
     if risk is None or shelf_days is None:
         return None
-    cover = "tidak terjual" if days_out == float("inf") else f"cukup sekitar {days_out:.0f} hari"
+    never = days_out == float("inf")
+    if lang == "en":
+        cover = "never sells" if never else f"covers about {days_out:.0f} days"
+        if risk == "high":
+            return (
+                f"Stock {cover}, longer than the {shelf_days}-day shelf life: expiry risk. "
+                "Hold purchases and sell the old stock first."
+            )
+        return f"Stock {cover}, close to the {shelf_days}-day shelf life. Keep an eye on it."
+    cover = "tidak terjual" if never else f"cukup sekitar {days_out:.0f} hari"
     if risk == "high":
         return (
             f"Stok {cover}, melebihi masa simpan {shelf_days} hari: berisiko kedaluwarsa. "
-            f"Tahan pembelian dan jual stok lama dulu."
+            "Tahan pembelian dan jual stok lama dulu."
         )
     return f"Stok {cover}, mendekati masa simpan {shelf_days} hari. Pantau."
 
@@ -66,8 +77,8 @@ def get_confirmed_item_sales(db: Session) -> list[dict[str, Any]]:
     return [{"sku_id": r[0], "tx_date": str(r[1]), "qty": float(r[2])} for r in rows]
 
 
-def build_restock_list(db: Session) -> list[dict[str, Any]]:
-    """Compute restock recommendations for all products."""
+def build_restock_list(db: Session, lang: str = "id") -> list[dict[str, Any]]:
+    """Compute restock recommendations for all products; texts are in `lang` ("id" or "en")."""
     settings = get_settings()
     products = get_products(db)
     sales = get_confirmed_item_sales(db)
@@ -115,7 +126,7 @@ def build_restock_list(db: Session) -> list[dict[str, Any]]:
         )
         days_out = days_until_stockout(current_stock, weekly_fc)
         act = action(current_stock, rop)
-        reason = restock_reason(name, current_stock, unit, weekly_fc, days_out, ltd)
+        reason = restock_reason(name, current_stock, unit, weekly_fc, days_out, ltd, lang)
 
         data_quality = data_quality_label(fc_result)
 
@@ -137,7 +148,7 @@ def build_restock_list(db: Session) -> list[dict[str, Any]]:
                 "z": z,
                 "shelf_life_days": shelf_days,
                 "shelf_life_risk": risk,
-                "shelf_life_note": shelf_life_note(risk, days_out, shelf_days),
+                "shelf_life_note": shelf_life_note(risk, days_out, shelf_days, lang),
                 "order_capped_by_shelf_life": order_qty < wanted_qty,
                 "wape_primary": fc_result["wape_primary"],
                 "wape_baseline": fc_result["wape_baseline"],

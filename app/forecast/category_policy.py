@@ -11,8 +11,23 @@ the shelf-life goods against a 10 % target, while one z per tier gave 10.6 % (du
 Each category still has its own entry, so a real shop with more data can tune it separately.
 
 Categories not listed here use SAFETY_STOCK_Z (also the durable value) and have no shelf life.
-Shelf lives are rough defaults for sealed stock in a dry store: confirm them against the
-supplier's label before relying on the warnings.
+
+Shelf lives are for sealed, unopened stock in a dry store, counted from the production date (not
+from the purchase date). They are the conservative end of what manufacturers and the literature
+give, because the warning exists to rotate stock. Sources (checked October 2026):
+- Cement, 90 days: bagged cement is typically stored 2-3 months in Europe (EUROSAC shelf-life study,
+  2019, https://www.eurosac.org/fileadmin/pdf/pdf_press_releases/2019_Shelf_life_study_Fact_sheet_EN.pdf);
+  the same study kept sealed sacks up to 18 months within quality limits, so 90 days is cautious.
+  Dry stock that sits too long clumps ("warehouse pack"). No Indonesian figure was found.
+- Mortar, tile adhesive, plaster, 180 days: 6 months from production in INSEE's tile mortar sheet
+  (https://siamcitycement.com/srilanka/en/products/detail/insee-tile-mortar) and in Cement Australia's
+  mortar mix sheet; H.B. Fuller allows up to 1 year.
+- Paint, 365 days: PPG puts unopened latex at about 2 years, Sherwin-Williams at about 1 year for some
+  lines (as reported by https://homesandgardens.com/solved/does-paint-go-bad); the shorter value is used.
+  Solvent-based enamel keeps longer. No Indonesian data sheet was found.
+- Waterproofing coatings and slurries, 365 days: 12 months from production for unopened packs in
+  Sika's data sheets (e.g. https://sgp.sika.com/content/dam/dms/sg01/x/sikacoat-555.pdf).
+A product's own label always wins: edit the entry for one category, or add a per-SKU value later.
 """
 
 from __future__ import annotations

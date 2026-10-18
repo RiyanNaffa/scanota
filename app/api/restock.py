@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Annotated, Any
+from typing import Annotated, Any, Literal
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -12,16 +12,28 @@ from app.forecast.service import build_restock_list, get_forecast_series
 
 router = APIRouter(prefix="/restock", tags=["restock"])
 
+_REPHRASE_PROMPT = {
+    "id": (
+        "Kamu adalah asisten toko. Parafrase kalimat berikut menjadi lebih ramah dalam bahasa "
+        "Indonesia. Jangan ubah angka apapun. Hanya kembalikan kalimat, tanpa penjelasan."
+    ),
+    "en": (
+        "You are a shop assistant. Rephrase the following sentence to sound friendlier, in English. "
+        "Do not change any number. Return only the sentence, with no explanation."
+    ),
+}
+
 
 @router.get("")
 def restock(
     db: Annotated[Session, Depends(get_db)],
     explain: str | None = None,
+    lang: Literal["id", "en"] = "id",
 ) -> list[dict[str, Any]]:
-    items = build_restock_list(db)
+    items = build_restock_list(db, lang)
 
     if explain == "llm":
-        items = _llm_explain(items)
+        items = _llm_explain(items, lang)
 
     return items
 
@@ -37,7 +49,7 @@ def forecast_series(
     return result
 
 
-def _llm_explain(items: list[dict]) -> list[dict]:
+def _llm_explain(items: list[dict], lang: str = "id") -> list[dict]:
     """Optionally rephrase reasons via LLM. Falls back silently on error."""
     try:
         import openai
@@ -59,11 +71,7 @@ def _llm_explain(items: list[dict]) -> list[dict]:
                         messages=[
                             {
                                 "role": "system",
-                                "content": (
-                                    "Kamu adalah asisten toko. Parafrase kalimat berikut "
-                                    "menjadi lebih ramah dalam bahasa Indonesia. "
-                                    "Jangan ubah angka apapun. Hanya kembalikan kalimat, tanpa penjelasan."
-                                ),
+                                "content": _REPHRASE_PROMPT.get(lang, _REPHRASE_PROMPT["id"]),
                             },
                             {"role": "user", "content": item["reason"]},
                         ],

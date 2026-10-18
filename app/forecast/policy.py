@@ -96,18 +96,21 @@ def restock_reason(
     weekly_forecast: float,
     days_out: float,
     lead_time_days: int,
+    lang: str = "id",
 ) -> str:
-    """Template-based reason string in Indonesian."""
+    """Template-based reason string, in Indonesian ("id") or English ("en")."""
     stock_str = f"{current_stock:,.0f}"
     fc_str = f"{weekly_forecast:.1f}"
-    lt_str = str(lead_time_days)
+    never = days_out == float("inf")
 
-    if days_out == float("inf"):
-        days_str = "tidak terhitung (permintaan nol)"
-    else:
-        days_str = f"sekitar {days_out:.0f} hari"
-
+    if lang == "en":
+        days_str = "not computable (zero demand)" if never else f"in about {days_out:.0f} days"
+        return (
+            f"Stock {stock_str} {unit}, expected to sell {fc_str} {unit}/week, "
+            f"runs out {days_str}. Lead time {lead_time_days} days."
+        )
+    days_str = "tidak terhitung (permintaan nol)" if never else f"sekitar {days_out:.0f} hari"
     return (
         f"Stok {stock_str} {unit}, perkiraan laku {fc_str} {unit}/minggu, "
-        f"habis {days_str}. Lead time {lt_str} hari."
+        f"habis {days_str}. Lead time {lead_time_days} hari."
     )
